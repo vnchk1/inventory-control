@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
+	"inventory-control/internal/config"
 	"log"
 )
 
@@ -29,8 +30,7 @@ func CreateProduct(conn *pgx.Conn, product *Products) error {
 		product.CategoryId).Scan(&product.Id)
 }
 
-func InitDB() (*pgx.Conn, error) {
-	ConnStr := "user=postgres password=postgres host=localhost port=5432 dbname=inventory_control sslmode=disable"
+func InitDB(ConnStr string) (*pgx.Conn, error) {
 	conn, err := pgx.Connect(context.Background(), ConnStr)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to connect to database: %v\n", err)
@@ -38,8 +38,18 @@ func InitDB() (*pgx.Conn, error) {
 	return conn, nil
 }
 
+func ConnStr(cfg *config.Config) string {
+	return fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v sslmode=%v",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
+}
+
 func main() {
-	conn, err := InitDB()
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("Error loading config: %v\n", err)
+	}
+
+	conn, err := InitDB(ConnStr(cfg))
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}

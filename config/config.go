@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-	"github.com/joho/godotenv"
 	"os"
 )
 
@@ -18,11 +16,6 @@ type Config struct {
 
 func LoadConfig() (*Config, error) {
 	config := &Config{}
-
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load .env file %w", err)
-	}
 
 	if logLvl := os.Getenv("LOG_LEVEL"); logLvl != "" {
 		config.LogLevel = logLvl

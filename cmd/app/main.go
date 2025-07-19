@@ -5,7 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/vnchk1/inventory-control/config"
 	"github.com/vnchk1/inventory-control/internal/db"
-	"github.com/vnchk1/inventory-control/internal/logger"
+	logging "github.com/vnchk1/inventory-control/internal/logger"
 	"github.com/vnchk1/inventory-control/internal/models"
 	"github.com/vnchk1/inventory-control/internal/repo/cruds"
 	"log"
@@ -22,7 +22,7 @@ func main() {
 		log.Fatalf("Error loading config: %v\n", err)
 	}
 
-	logger := logger.NewLogger(cfg.LogLevel)
+	logger := logging.NewLogger(cfg.LogLevel)
 
 	conn, err := db.InitDB(db.ConnStr(cfg))
 	if err != nil {
@@ -30,16 +30,28 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	user := &models.Products{
-		Id:         1,
-		Name:       "guest",
-		Price:      1000,
-		Quantity:   1,
+	exampleProduct := &models.Products{
+		Id:         15,
+		Name:       "guesttttt",
+		Quantity:   44,
 		CategoryId: 1,
 	}
 
-	err = repo.Create(conn, user, logger)
+	//err = repo.Create(conn, logger, exampleProduct)
+	//if err != nil {
+	//	log.Fatalf("Unable to create product: %v\n", err)
+	//}
+
+	exampleId := 15
+
+	err = repo.Update(conn, logger, exampleProduct)
 	if err != nil {
-		log.Fatalf("Unable to create product: %v\n", err)
+		log.Fatalf("Error updating product: %v\n", err)
 	}
+
+	err = repo.Read(conn, logger, exampleId)
+	if err != nil {
+		log.Fatalf("Unable to read product: %v\n", err)
+	}
+
 }

@@ -2,39 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
-	"github.com/vnchk1/inventory_control/config"
+	"github.com/vnchk1/inventory-control/config"
+	"github.com/vnchk1/inventory-control/internal/db"
+	"github.com/vnchk1/inventory-control/internal/logger"
+	"github.com/vnchk1/inventory-control/internal/models"
+	"github.com/vnchk1/inventory-control/internal/repo/cruds"
 	"log"
-	"github.com/vnchk1/inventory_control/internal/models"
 )
-
-func ConnStr(cfg *config.Config) string {
-	return fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v sslmode=%v",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
-}
-
-func InitDB(ConnStr string) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), ConnStr)
-	if err != nil {
-		return nil, fmt.Errorf("Unable to connect to database: %v\n", err)
-	}
-	return conn, nil
-}
-
-func CreateProduct(conn *pgx.Conn, product *Products) error {
-	query := `
-	INSERT INTO products (product_name, price, quantity, category_id) 
-	VALUES ($1, $2, $3, $4) RETURNING product_id`
-
-	return conn.QueryRow(
-		context.Background(), +query,
-		product.Name,
-		product.Price,
-		product.Quantity,
-		product.CategoryId).Scan(&product.Id)
-}
 
 func main() {
 	err := godotenv.Load()
@@ -47,13 +22,15 @@ func main() {
 		log.Fatalf("Error loading config: %v\n", err)
 	}
 
-	conn, err := InitDB(ConnStr(cfg))
+	logger := logger.NewLogger(cfg.LogLevel)
+
+	conn, err := db.InitDB(db.ConnStr(cfg))
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
+		log.Fatalf("Unable to connect to db: %v\n", err)
 	}
 	defer conn.Close(context.Background())
 
-	user := &Products{
+	user := &models.Products{
 		Id:         1,
 		Name:       "guest",
 		Price:      1000,
@@ -61,7 +38,7 @@ func main() {
 		CategoryId: 1,
 	}
 
-	err = CreateProduct(conn, user)
+	err = repo.Create(conn, user, logger)
 	if err != nil {
 		log.Fatalf("Unable to create product: %v\n", err)
 	}

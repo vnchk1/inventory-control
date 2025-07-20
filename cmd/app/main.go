@@ -30,11 +30,11 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	exampleProduct := &models.Products{
-		Id:         15,
+	exampleProduct := &models.Product{
+		ID:         17,
 		Name:       "guesttttt",
 		Quantity:   44,
-		CategoryId: 1,
+		CategoryID: 1,
 	}
 
 	//err = repo.Create(conn, logger, exampleProduct)
@@ -42,7 +42,7 @@ func main() {
 	//	log.Fatalf("Unable to create product: %v\n", err)
 	//}
 
-	exampleId := 15
+	exampleId := 17
 
 	err = repo.Update(conn, logger, exampleProduct)
 	if err != nil {

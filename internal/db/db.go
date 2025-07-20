@@ -8,8 +8,8 @@ import (
 )
 
 func ConnStr(cfg *config.Config) string {
-	return fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v sslmode=%v",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
+	return fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 }
 
 func InitDB(ConnStr string) (*pgx.Conn, error) {

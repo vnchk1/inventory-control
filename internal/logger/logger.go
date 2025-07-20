@@ -3,6 +3,7 @@ package logger
 import (
 	"log/slog"
 	"os"
+	"strings"
 )
 
 func NewLogger(lvlStr string) (logger *slog.Logger) {
@@ -15,12 +16,12 @@ func NewLogger(lvlStr string) (logger *slog.Logger) {
 }
 
 func ConvertLogLvl(lvl string) slog.Level {
-	switch lvl {
-	case "DEBUG":
+	switch strings.ToLower(lvl) {
+	case "debug":
 		return slog.LevelDebug
-	case "WARN":
+	case "warn":
 		return slog.LevelWarn
-	case "ERROR":
+	case "error":
 		return slog.LevelError
 	default:
 		return slog.LevelInfo

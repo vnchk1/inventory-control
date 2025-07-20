@@ -11,7 +11,6 @@ type Config struct {
 	Host     string
 	Port     string
 	DBName   string
-	SSLMode  string
 }
 
 func LoadConfig() (*Config, error) {
@@ -34,9 +33,6 @@ func LoadConfig() (*Config, error) {
 	}
 	if dbname := os.Getenv("DB_NAME"); dbname != "" {
 		config.DBName = dbname
-	}
-	if sslmode := os.Getenv("SSL_MODE"); sslmode != "" {
-		config.SSLMode = sslmode
 	}
 
 	return config, nil

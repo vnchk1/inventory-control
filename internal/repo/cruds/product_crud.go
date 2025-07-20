@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func Create(conn *pgx.Conn, logger *slog.Logger, product *models.Products) (err error) {
+func Create(conn *pgx.Conn, logger *slog.Logger, product *models.Product) (err error) {
 	query := `
 	INSERT INTO products (product_name, price, quantity, category_id) 
 	VALUES ($1, $2, $3, $4) RETURNING product_id`
@@ -17,43 +17,43 @@ func Create(conn *pgx.Conn, logger *slog.Logger, product *models.Products) (err 
 		product.Name,
 		product.Price,
 		product.Quantity,
-		product.CategoryId).Scan(&product.Id)
+		product.CategoryID).Scan(&product.ID)
 
-	logger.Info("Product created",
+	logger.Debug("Product created",
 		"product_name", product.Name,
 		"price", product.Price,
 		"quantity", product.Quantity,
-		"category_id", product.CategoryId,
-		"product_id", product.Id)
+		"category_id", product.CategoryID,
+		"product_id", product.ID)
 
 	return
 }
 
 func Read(conn *pgx.Conn, logger *slog.Logger, id int) (err error) {
-	var product models.Products
+	var product models.Product
 
 	query := `
 	SELECT * FROM products WHERE product_id = $1`
 
 	err = conn.QueryRow(
 		context.Background(), query,
-		id).Scan(&product.Id,
+		id).Scan(&product.ID,
 		&product.Name,
 		&product.Price,
 		&product.Quantity,
-		&product.CategoryId)
+		&product.CategoryID)
 
-	logger.Info("Product read",
-		"product_id", product.Id,
+	logger.Debug("Product read",
+		"product_id", product.ID,
 		"product_name", product.Name,
 		"price", product.Price,
 		"quantity", product.Quantity,
-		"category_id", product.CategoryId)
+		"category_id", product.CategoryID)
 
 	return
 }
 
-func Update(conn *pgx.Conn, logger *slog.Logger, product *models.Products) (err error) {
+func Update(conn *pgx.Conn, logger *slog.Logger, product *models.Product) (err error) {
 	query := `UPDATE products SET 
 		product_name = $1, 
 		price = $2, 
@@ -65,15 +65,15 @@ func Update(conn *pgx.Conn, logger *slog.Logger, product *models.Products) (err 
 		product.Name,
 		product.Price,
 		product.Quantity,
-		product.CategoryId,
-		product.Id)
+		product.CategoryID,
+		product.ID)
 
-	logger.Info("Product updated",
-		"product_id", product.Id,
+	logger.Debug("Product updated",
+		"product_id", product.ID,
 		"product_name", product.Name,
 		"price", product.Price,
 		"quantity", product.Quantity,
-		"category_id", product.CategoryId)
+		"category_id", product.CategoryID)
 
 	return
 }

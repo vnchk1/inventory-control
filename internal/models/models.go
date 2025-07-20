@@ -1,9 +1,9 @@
 package models
 
-type Products struct {
-	Id         int
+type Product struct {
+	ID         int
 	Name       string
 	Price      int
 	Quantity   int
-	CategoryId int
+	CategoryID int
 }

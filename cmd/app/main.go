@@ -6,7 +6,6 @@ import (
 	"github.com/vnchk1/inventory-control/config"
 	"github.com/vnchk1/inventory-control/internal/db"
 	logging "github.com/vnchk1/inventory-control/internal/logger"
-	"github.com/vnchk1/inventory-control/internal/models"
 	"github.com/vnchk1/inventory-control/internal/repo/cruds"
 	"log"
 )
@@ -30,28 +29,33 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	exampleProduct := &models.Product{
-		ID:         17,
-		Name:       "guesttttt",
-		Quantity:   44,
-		CategoryID: 1,
-	}
+	//exampleProduct := &models.Product{
+	//	ID:         17,
+	//	Name:       "guesttttt",
+	//	Quantity:   44,
+	//	CategoryID: 1,
+	//}
 
 	//err = repo.Create(conn, logger, exampleProduct)
 	//if err != nil {
-	//	log.Fatalf("Unable to create product: %v\n", err)
+	//	log.Fatalf("Error creating product: %v\n", err)
 	//}
 
-	exampleId := 17
+	exampleID := 12
 
-	err = repo.Update(conn, logger, exampleProduct)
+	//err = repo.Update(conn, logger, exampleProduct)
+	//if err != nil {
+	//	log.Fatalf("Error updating product: %v\n", err)
+	//}
+
+	err = cruds.Delete(conn, logger, exampleID)
 	if err != nil {
-		log.Fatalf("Error updating product: %v\n", err)
+		log.Fatalf("Error deleting product: %v\n", err)
 	}
 
-	err = repo.Read(conn, logger, exampleId)
+	err = cruds.Read(conn, logger, exampleID)
 	if err != nil {
-		log.Fatalf("Unable to read product: %v\n", err)
+		log.Fatalf("Error reading product: %v\n", err)
 	}
 
 }

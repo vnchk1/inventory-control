@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vnchk1/inventory-control/internal/config"
+	"log"
 )
 
 type DB struct {
@@ -14,11 +15,12 @@ type DB struct {
 }
 
 func connStr(cfg *config.Config) string {
-	return fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
+	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBSSLMode)
 }
 
 func NewDB(cfg *config.Config) (*DB, error) {
+	log.Println("Connecting to DB", connStr(cfg))
 	pool, err := pgxpool.New(context.Background(), connStr(cfg))
 	if err != nil {
 		return nil, fmt.Errorf("db connect error: %v\n", err)

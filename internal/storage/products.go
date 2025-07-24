@@ -3,8 +3,8 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/vnchk1/inventory-control/internal/db"
 	"github.com/vnchk1/inventory-control/internal/models"
+	"github.com/vnchk1/inventory-control/internal/storage/db"
 )
 
 type Products struct {
@@ -15,7 +15,7 @@ func NewProducts(db *db.DB) (*Products, error) {
 	return &Products{pool: db}, nil
 }
 
-func (p *Products) Create(ctx context.Context, product *models.Product) (err error) {
+func (p *Products) Create(ctx context.Context, product models.Product) (err error) {
 	query := `
 	INSERT INTO products (product_name, price, quantity, category_id) 
 	VALUES ($1, $2, $3, $4) RETURNING product_id`
@@ -41,14 +41,12 @@ func (p *Products) Create(ctx context.Context, product *models.Product) (err err
 	return
 }
 
-func (p *Products) Read(ctx context.Context, id int) (err error) {
-	var product models.Product
-
+func (p *Products) Read(ctx context.Context, id int) (product models.Product, err error) {
 	query := `
 	SELECT * FROM products WHERE product_id = $1`
 
 	err = p.pool.QueryRow(
-		context.Background(), query,
+		ctx, query,
 		id).Scan(&product.ID,
 		&product.Name,
 		&product.Price,
@@ -69,7 +67,7 @@ func (p *Products) Read(ctx context.Context, id int) (err error) {
 	return
 }
 
-func (p *Products) Update(ctx context.Context, product *models.Product) (err error) {
+func (p *Products) Update(ctx context.Context, product models.Product) (err error) {
 	query := `UPDATE products SET 
 		product_name = $1, 
 		price = $2, 
@@ -77,7 +75,7 @@ func (p *Products) Update(ctx context.Context, product *models.Product) (err err
 		category_id = $4
 		WHERE product_id = $5`
 
-	_, err = p.pool.Exec(context.Background(), query,
+	_, err = p.pool.Exec(ctx, query,
 		product.Name,
 		product.Price,
 		product.Quantity,
@@ -101,7 +99,7 @@ func (p *Products) Update(ctx context.Context, product *models.Product) (err err
 func (p *Products) Delete(ctx context.Context, id int) (err error) {
 	query := `DELETE FROM products WHERE product_id = $1`
 
-	result, err := p.pool.Exec(context.Background(), query, id)
+	result, err := p.pool.Exec(ctx, query, id)
 	if err != nil {
 		err = fmt.Errorf("error deleting row: %w", err)
 		return

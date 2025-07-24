@@ -5,12 +5,14 @@ import (
 )
 
 type Config struct {
-	LogLevel string
-	User     string
-	Password string
-	Host     string
-	Port     string
-	DBName   string
+	LogLevel   string
+	ServerPort string
+	DBUser     string
+	DBPassword string
+	DBHost     string
+	DBPort     string
+	DBName     string
+	DBSSLMode  string
 }
 
 func LoadConfig() (*Config, error) {
@@ -19,20 +21,26 @@ func LoadConfig() (*Config, error) {
 	if logLvl := os.Getenv("LOG_LEVEL"); logLvl != "" {
 		config.LogLevel = logLvl
 	}
-	if user := os.Getenv("USER"); user != "" {
-		config.User = user
+	if serverPort := os.Getenv("SERVER_PORT"); serverPort != "" {
+		config.ServerPort = serverPort
 	}
-	if password := os.Getenv("PASSWORD"); password != "" {
-		config.Password = password
+	if user := os.Getenv("DB_USER"); user != "" {
+		config.DBUser = user
 	}
-	if host := os.Getenv("HOST"); host != "" {
-		config.Host = host
+	if password := os.Getenv("DB_PASSWORD"); password != "" {
+		config.DBPassword = password
 	}
-	if port := os.Getenv("PORT"); port != "" {
-		config.Port = port
+	if host := os.Getenv("DB_HOST"); host != "" {
+		config.DBHost = host
+	}
+	if port := os.Getenv("DB_PORT"); port != "" {
+		config.DBPort = port
 	}
 	if dbname := os.Getenv("DB_NAME"); dbname != "" {
 		config.DBName = dbname
+	}
+	if sslmode := os.Getenv("SSL_MODE"); sslmode != "" {
+		config.DBSSLMode = sslmode
 	}
 
 	return config, nil

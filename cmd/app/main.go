@@ -1,12 +1,15 @@
 package main
 
 import (
-	"context"
 	"github.com/joho/godotenv"
-	"github.com/vnchk1/inventory-control/config"
-	"github.com/vnchk1/inventory-control/internal/db"
+	"github.com/labstack/echo/v4"
+	"github.com/vnchk1/inventory-control/internal/config"
 	logging "github.com/vnchk1/inventory-control/internal/logger"
-	"github.com/vnchk1/inventory-control/internal/repo/cruds"
+	"github.com/vnchk1/inventory-control/internal/middleware"
+	"github.com/vnchk1/inventory-control/internal/server"
+	"github.com/vnchk1/inventory-control/internal/services/products"
+	"github.com/vnchk1/inventory-control/internal/storage"
+	"github.com/vnchk1/inventory-control/internal/storage/db"
 	"log"
 )
 
@@ -20,42 +23,34 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading config: %v\n", err)
 	}
-
+	//логгер
 	logger := logging.NewLogger(cfg.LogLevel)
-
-	conn, err := db.InitDB(db.ConnStr(cfg))
+	//БД
+	pool, err := db.NewDB(cfg)
 	if err != nil {
-		log.Fatalf("Unable to connect to db: %v\n", err)
+		log.Fatalf("Error connecting to DB: %v\n", err)
 	}
-	defer conn.Close(context.Background())
-
-	//exampleProduct := &models.Product{
-	//	ID:         17,
-	//	Name:       "guesttttt",
-	//	Quantity:   44,
-	//	CategoryID: 1,
-	//}
-
-	//err = repo.Create(conn, logger, exampleProduct)
-	//if err != nil {
-	//	log.Fatalf("Error creating product: %v\n", err)
-	//}
-
-	exampleID := 12
-
-	//err = repo.Update(conn, logger, exampleProduct)
-	//if err != nil {
-	//	log.Fatalf("Error updating product: %v\n", err)
-	//}
-
-	err = cruds.Delete(conn, logger, exampleID)
+	//работа с БД
+	productStorage, err := storage.NewProducts(pool)
 	if err != nil {
-		log.Fatalf("Error deleting product: %v\n", err)
+		log.Fatalf("Error creating product storage: %v\n", err)
 	}
+	//сервис
+	productService := products.NewProductService(productStorage)
+	//продуктовый хендлер
+	//productHandler := server.NewProductHandler(productService, logger)
+	//хендлеры
+	h := server.NewHandlers(productService, logger)
+	//err = server.NewServer(cfg)
 
-	err = cruds.Read(conn, logger, exampleID)
+	e := echo.New()
+	e.Use(middleware.LoggingMiddleware(logger))
+	productGroup := e.Group("/products")
+	productGroup.GET("/:id", h.Products.Read)
+
+	err = e.Start(":" + cfg.ServerPort)
 	if err != nil {
-		log.Fatalf("Error reading product: %v\n", err)
+		log.Fatalf("Error starting server: %v\n", err)
 	}
 
 }

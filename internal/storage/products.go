@@ -4,18 +4,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/vnchk1/inventory-control/internal/models"
-	"github.com/vnchk1/inventory-control/internal/storage/db"
 )
 
-type Products struct {
-	pool *db.DB
+type ProductStorage struct {
+	pool *DB
 }
 
-func NewProducts(db *db.DB) (*Products, error) {
-	return &Products{pool: db}, nil
+func NewProductStorage(db *DB) *ProductStorage {
+	return &ProductStorage{pool: db}
 }
 
-func (p *Products) Create(ctx context.Context, product models.Product) (err error) {
+func (p *ProductStorage) Create(ctx context.Context, product models.Product) (err error) {
 	query := `
 	INSERT INTO products (product_name, price, quantity, category_id) 
 	VALUES ($1, $2, $3, $4) RETURNING product_id`
@@ -41,7 +40,7 @@ func (p *Products) Create(ctx context.Context, product models.Product) (err erro
 	return
 }
 
-func (p *Products) Read(ctx context.Context, id int) (product models.Product, err error) {
+func (p *ProductStorage) Read(ctx context.Context, id int) (product models.Product, err error) {
 	query := `
 	SELECT * FROM products WHERE product_id = $1`
 
@@ -53,7 +52,7 @@ func (p *Products) Read(ctx context.Context, id int) (product models.Product, er
 		&product.Quantity,
 		&product.CategoryID)
 	if err != nil {
-		err = fmt.Errorf("error selecting row: %w", err)
+		err = fmt.Errorf("row SELECT error: %w", err)
 		return
 	}
 
@@ -67,7 +66,7 @@ func (p *Products) Read(ctx context.Context, id int) (product models.Product, er
 	return
 }
 
-func (p *Products) Update(ctx context.Context, product models.Product) (err error) {
+func (p *ProductStorage) Update(ctx context.Context, product models.Product) (err error) {
 	query := `UPDATE products SET 
 		product_name = $1, 
 		price = $2, 
@@ -96,7 +95,7 @@ func (p *Products) Update(ctx context.Context, product models.Product) (err erro
 	return
 }
 
-func (p *Products) Delete(ctx context.Context, id int) (err error) {
+func (p *ProductStorage) Delete(ctx context.Context, id int) (err error) {
 	query := `DELETE FROM products WHERE product_id = $1`
 
 	result, err := p.pool.Exec(ctx, query, id)

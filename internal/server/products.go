@@ -39,7 +39,7 @@ func (p *ProductHandler) Read(c echo.Context) error {
 
 	product, err := p.Service.Read(c.Request().Context(), id)
 	if err != nil {
-		p.Logger.Error("Product not found", "error", err)
+		p.Logger.Error("services.products.Read", "error", err)
 		return c.JSON(http.StatusNotFound, "Product not found")
 	}
 

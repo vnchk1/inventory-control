@@ -6,18 +6,16 @@ import (
 	"github.com/vnchk1/inventory-control/internal/models"
 )
 
-type (
-	ProductRepo interface {
-		Create(context.Context, models.Product) error
-		Read(context.Context, int) (models.Product, error)
-		Update(context.Context, models.Product) error
-		Delete(context.Context, int) error
-	}
+type ProductRepo interface {
+	Create(context.Context, models.Product) error
+	Read(context.Context, int) (models.Product, error)
+	Update(context.Context, models.Product) error
+	Delete(context.Context, int) error
+}
 
-	Products struct {
-		Storage ProductRepo
-	}
-)
+type Products struct {
+	Storage ProductRepo
+}
 
 func NewProductService(storage ProductRepo) *Products {
 	return &Products{
@@ -26,9 +24,6 @@ func NewProductService(storage ProductRepo) *Products {
 }
 
 func (c *Products) Create(ctx context.Context, product models.Product) (err error) {
-	if product.ID <= 0 {
-		return fmt.Errorf("product_id must be a positive number %v", product.ID)
-	}
 	if product.Name == "" {
 		return fmt.Errorf("name cannot be empty %v", product.Name)
 	}

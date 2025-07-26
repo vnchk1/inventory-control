@@ -30,6 +30,23 @@ func NewProductHandler(service ProductService, logger *slog.Logger) *ProductHand
 	}
 }
 
+func (p *ProductHandler) Create(c echo.Context) error {
+	var req models.Product
+
+	err := c.Bind(&req)
+	if err != nil {
+		p.Logger.Error("error parsing JSON", "error", err)
+		return c.JSON(http.StatusBadRequest, models.InvalidRequestBodyString)
+	}
+
+	err = p.Service.Create(c.Request().Context(), req)
+	if err != nil {
+		p.Logger.Error("services.product.Create", "error", err)
+		return c.JSON(http.StatusInternalServerError, models.InternalServerErrorString)
+	}
+	return c.JSON(http.StatusCreated, req)
+}
+
 func (p *ProductHandler) Read(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -44,4 +61,36 @@ func (p *ProductHandler) Read(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, product)
+}
+
+func (p *ProductHandler) Update(c echo.Context) error {
+	var req models.Product
+
+	err := c.Bind(&req)
+	if err != nil {
+		p.Logger.Error("error parsing JSON", "error", err)
+		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: models.InvalidRequestBodyString})
+	}
+
+	err = p.Service.Update(c.Request().Context(), req)
+	if err != nil {
+		p.Logger.Error("services.product.Update", "error", err)
+		return c.JSON(http.StatusInternalServerError, models.InternalServerErrorString)
+	}
+	return c.JSON(http.StatusCreated, req)
+}
+
+func (p *ProductHandler) Delete(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		p.Logger.Error("Invalid ID", "error", err)
+	}
+
+	err = p.Service.Delete(c.Request().Context(), id)
+	if err != nil {
+		p.Logger.Error("services.products.Delete", "error", err)
+		return c.JSON(http.StatusNotFound, "Product not found")
+	}
+
+	return c.JSON(http.StatusNoContent, nil)
 }

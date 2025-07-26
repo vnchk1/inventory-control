@@ -31,6 +31,9 @@ func (s *Server) RegisterRoutes(h *Handlers) {
 	productGroup := s.Echo.Group("/products")
 
 	productGroup.GET("/:id", h.Products.Read)
+	productGroup.POST("/create", h.Products.Create)
+	productGroup.PUT("/update", h.Products.Update)
+	productGroup.DELETE("/:id", h.Products.Delete)
 }
 
 func (s *Server) Start() (err error) {

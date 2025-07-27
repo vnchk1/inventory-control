@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"github.com/labstack/echo/v4"
 	"github.com/vnchk1/inventory-control/internal/config"
@@ -36,12 +37,21 @@ func (s *Server) RegisterRoutes(h *Handlers) {
 	productGroup.DELETE("/:id", h.Products.Delete)
 }
 
-func (s *Server) Start() (err error) {
+func (s *Server) Run() (err error) {
 	go func() {
 		err = s.Echo.Start(":" + s.Config.ServerPort)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.Logger.Error("server.Start: ", "error", err, "port", s.Config.ServerPort)
 		}
 	}()
+	return
+}
+
+func (s *Server) Stop(ctx context.Context) (err error) {
+	s.Logger.Info("Stopping server")
+	err = s.Echo.Shutdown(context.Background())
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		s.Logger.Error("server.Stop: ", "error", err, "port", s.Config.ServerPort)
+	}
 	return
 }

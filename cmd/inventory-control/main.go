@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/joho/godotenv"
-	app1 "github.com/vnchk1/inventory-control/internal/app"
+	apppkg "github.com/vnchk1/inventory-control/internal/app"
 	"github.com/vnchk1/inventory-control/internal/config"
 	logging "github.com/vnchk1/inventory-control/internal/logger"
 	"log"
@@ -26,7 +26,7 @@ func main() {
 	//логгер
 	logger := logging.NewLogger(cfg.LogLevel)
 
-	app := app1.NewApp(cfg, logger)
+	app := apppkg.NewApp(cfg, logger)
 
 	err = app.Run()
 	if err != nil {

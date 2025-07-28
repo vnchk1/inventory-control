@@ -1,9 +1,9 @@
 package models
 
 type Product struct {
-	ID         int
-	Name       string
-	Price      int
-	Quantity   int
-	CategoryID int
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	Price      int    `json:"price"`
+	Quantity   int    `json:"quantity"`
+	CategoryID int    `json:"category_id"`
 }

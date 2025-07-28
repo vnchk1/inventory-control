@@ -29,13 +29,6 @@ func (p *ProductStorage) Create(ctx context.Context, product models.Product) (er
 		return fmt.Errorf("error inserting row: %w", err)
 	}
 
-	//logger.Debug("Product created",
-	//	"product_name", product.Name,
-	//	"price", product.Price,
-	//	"quantity", product.Quantity,
-	//	"category_id", product.CategoryID,
-	//	"product_id", product.ID)
-
 	return
 }
 
@@ -54,13 +47,6 @@ func (p *ProductStorage) Read(ctx context.Context, id int) (product models.Produ
 		err = fmt.Errorf("row SELECT error: %w", err)
 		return
 	}
-
-	//logger.Debug("Product read",
-	//	"product_id", product.ID,
-	//	"product_name", product.Name,
-	//	"price", product.Price,
-	//	"quantity", product.Quantity,
-	//	"category_id", product.CategoryID)
 
 	return
 }
@@ -83,13 +69,6 @@ func (p *ProductStorage) Update(ctx context.Context, product models.Product) (er
 		return fmt.Errorf("error updating row: %w", err)
 	}
 
-	//logger.Debug("Product updated",
-	//	"product_id", product.ID,
-	//	"product_name", product.Name,
-	//	"price", product.Price,
-	//	"quantity", product.Quantity,
-	//	"category_id", product.CategoryID)
-
 	return
 }
 
@@ -105,9 +84,6 @@ func (p *ProductStorage) Delete(ctx context.Context, id int) (err error) {
 	if result.RowsAffected() == 0 {
 		return fmt.Errorf("row not found")
 	}
-
-	//logger.Debug("Product deleted",
-	//	"product_id", id)
 
 	return
 }

@@ -36,13 +36,13 @@ func (p *ProductHandler) Create(c echo.Context) error {
 	err := c.Bind(&req)
 	if err != nil {
 		p.Logger.Error("error parsing JSON", "error", err)
-		return c.JSON(http.StatusBadRequest, models.InvalidRequestBodyString)
+		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 
 	err = p.Service.Create(c.Request().Context(), req)
 	if err != nil {
 		p.Logger.Error("services.product.Create", "error", err)
-		return c.JSON(http.StatusInternalServerError, models.InternalServerErrorString)
+		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 	return c.JSON(http.StatusCreated, req)
 }
@@ -51,13 +51,13 @@ func (p *ProductHandler) Read(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		p.Logger.Error("Invalid ID", "error", err)
-		return c.JSON(http.StatusBadRequest, "Invalid ID")
+		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 
 	product, err := p.Service.Read(c.Request().Context(), id)
 	if err != nil {
 		p.Logger.Error("services.products.Read", "error", err)
-		return c.JSON(http.StatusNotFound, "Product not found")
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	return c.JSON(http.StatusOK, product)
@@ -69,13 +69,13 @@ func (p *ProductHandler) Update(c echo.Context) error {
 	err := c.Bind(&req)
 	if err != nil {
 		p.Logger.Error("error parsing JSON", "error", err)
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: models.InvalidRequestBodyString})
+		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 
 	err = p.Service.Update(c.Request().Context(), req)
 	if err != nil {
 		p.Logger.Error("services.product.Update", "error", err)
-		return c.JSON(http.StatusInternalServerError, models.InternalServerErrorString)
+		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 	return c.JSON(http.StatusCreated, req)
 }
@@ -89,7 +89,7 @@ func (p *ProductHandler) Delete(c echo.Context) error {
 	err = p.Service.Delete(c.Request().Context(), id)
 	if err != nil {
 		p.Logger.Error("services.products.Delete", "error", err)
-		return c.JSON(http.StatusNotFound, "Product not found")
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	return c.JSON(http.StatusNoContent, nil)

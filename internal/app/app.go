@@ -3,35 +3,32 @@ package app
 import (
 	"context"
 	"github.com/vnchk1/inventory-control/internal/config"
-	server1 "github.com/vnchk1/inventory-control/internal/server"
-	productservice "github.com/vnchk1/inventory-control/internal/services/products"
+	serverpkg "github.com/vnchk1/inventory-control/internal/server"
+	productservice "github.com/vnchk1/inventory-control/internal/services"
 	"github.com/vnchk1/inventory-control/internal/storage"
 	"log/slog"
 )
 
 type App struct {
-	Server *server1.Server
+	Server *serverpkg.Server
 	DB     *storage.DB
 	Logger *slog.Logger
 }
 
 func NewApp(cfg *config.Config, logger *slog.Logger) *App {
-	//инициализация БД
 	pool, err := storage.NewDB(cfg)
 	if err != nil {
 		logger.Error("Error connecting to DB: %v\n", "error", err)
 	}
 	logger.Info("Connected to DB", "stat", pool.GetConnString())
-	//работа с БД
+
 	productStorage := storage.NewProductStorage(pool)
-	//use cases
 	productService := productservice.NewProductService(productStorage)
-	//infrastructure
-	handlers := server1.NewHandlers(productService, logger)
-	//инициализация сервера
-	server := server1.NewServer(cfg, logger)
+	handlers := serverpkg.NewHandlers(productService, logger)
+
+	server := serverpkg.NewServer(cfg, logger)
 	logger.Info("Starting server", "port", server.Config.ServerPort)
-	//регистрация маршрутов
+
 	server.RegisterRoutes(handlers)
 	return &App{
 		Server: server,

@@ -18,6 +18,8 @@ type Server struct {
 
 func NewServer(cfg *config.Config, logger *slog.Logger) *Server {
 	e := echo.New()
+	e.HideBanner = true
+	e.HidePort = true
 
 	e.Use(middleware.LoggingMiddleware(logger))
 
@@ -41,7 +43,7 @@ func (s *Server) Run() (err error) {
 	go func() {
 		err = s.Echo.Start(":" + s.Config.ServerPort)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			s.Logger.Error("server.Start: ", "error", err, "port", s.Config.ServerPort)
+			s.Logger.Error("server.Run: ", "error", err, "port", s.Config.ServerPort)
 		}
 	}()
 	return

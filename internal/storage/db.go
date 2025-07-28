@@ -7,7 +7,6 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vnchk1/inventory-control/internal/config"
-	"log"
 )
 
 type DB struct {
@@ -16,7 +15,6 @@ type DB struct {
 
 func NewDB(cfg *config.Config) (*DB, error) {
 	connStr := config.ConnStr(cfg)
-	log.Println("Connecting to DB", connStr)
 	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
 		return nil, fmt.Errorf("db connect error: %v\n", err)
@@ -35,6 +33,10 @@ func (d *DB) Exec(ctx context.Context, query string, args ...interface{}) (pgcon
 
 func (d *DB) BeginTx(ctx context.Context, opts pgx.TxOptions) (pgx.Tx, error) {
 	return d.pool.BeginTx(ctx, opts)
+}
+
+func (d *DB) GetConnString() string {
+	return d.pool.Config().ConnString()
 }
 
 func (d *DB) Close(ctx context.Context) {

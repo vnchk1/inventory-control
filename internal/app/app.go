@@ -3,14 +3,14 @@ package app
 import (
 	"context"
 	"github.com/vnchk1/inventory-control/internal/config"
-	"github.com/vnchk1/inventory-control/internal/server"
+	server1 "github.com/vnchk1/inventory-control/internal/server"
 	productservice "github.com/vnchk1/inventory-control/internal/services/products"
 	"github.com/vnchk1/inventory-control/internal/storage"
 	"log/slog"
 )
 
 type App struct {
-	Server *server.Server
+	Server *server1.Server
 	DB     *storage.DB
 	Logger *slog.Logger
 }
@@ -21,28 +21,32 @@ func NewApp(cfg *config.Config, logger *slog.Logger) *App {
 	if err != nil {
 		logger.Error("Error connecting to DB: %v\n", "error", err)
 	}
+	logger.Info("Connected to DB", "stat", pool.GetConnString())
 	//работа с БД
 	productStorage := storage.NewProductStorage(pool)
 	//use cases
 	productService := productservice.NewProductService(productStorage)
 	//infrastructure
-	handlers := server.NewHandlers(productService, logger)
+	handlers := server1.NewHandlers(productService, logger)
 	//инициализация сервера
-	newServer := server.NewServer(cfg, logger)
+	server := server1.NewServer(cfg, logger)
+	logger.Info("Starting server", "port", server.Config.ServerPort)
 	//регистрация маршрутов
-	newServer.RegisterRoutes(handlers)
+	server.RegisterRoutes(handlers)
 	return &App{
-		Server: newServer,
+		Server: server,
 		DB:     pool,
 		Logger: logger,
 	}
 }
 
-func (p *App) Run() {
-	err := p.Server.Run()
+func (p *App) Run() (err error) {
+	err = p.Server.Run()
 	if err != nil {
-		p.Logger.Error("Error starting server: %v\n", "error", err)
+		p.Logger.Error("app.Run: %v\n", "error", err)
+		return
 	}
+	return
 }
 
 func (p *App) Stop(ctx context.Context) {

@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/joho/godotenv"
-	apppkg "github.com/vnchk1/inventory-control/internal/app"
-	"github.com/vnchk1/inventory-control/internal/config"
-	logging "github.com/vnchk1/inventory-control/internal/logger"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/joho/godotenv"
+	apppkg "github.com/vnchk1/inventory-control/internal/app"
+	"github.com/vnchk1/inventory-control/internal/config"
+	logging "github.com/vnchk1/inventory-control/internal/logger"
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading config: %v\n", err)
 	}
-	//логгер
+	// логгер
 	logger := logging.NewLogger(cfg.LogLevel)
 
 	app := apppkg.NewApp(cfg, logger)
@@ -33,7 +34,7 @@ func main() {
 		log.Fatalf("Error starting server: %v\n", err)
 	}
 
-	//graceful shutdown
+	// graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 

@@ -12,6 +12,7 @@ func NewLogger(lvlStr string) (logger *slog.Logger) {
 		Level: lvl,
 	})
 	logger = slog.New(logHandler)
+
 	return
 }
 

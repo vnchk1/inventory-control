@@ -20,7 +20,7 @@ func NewApp(cfg *config.Config, logger *slog.Logger) *App {
 	if err != nil {
 		logger.Error("Error connecting to DB: %v\n", "error", err)
 	}
-	logger.Info("Connected to DB", "stat", pool.GetConnString())
+	logger.Info("Connected to DB", "conn string", pool.GetConnString())
 
 	productStorage := storage.NewProductStorage(pool)
 	productService := productservice.NewProductService(productStorage)
@@ -52,7 +52,7 @@ func (p *App) Stop(ctx context.Context) {
 
 	doneChan := make(chan error)
 	go func() {
-		doneChan <- p.Server.Stop(ctx)
+		doneChan <- p.Server.Stop()
 	}()
 
 	select {

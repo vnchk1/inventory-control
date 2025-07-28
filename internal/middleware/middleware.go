@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/labstack/echo/v4"
 	"log/slog"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 func LoggingMiddleware(logger *slog.Logger) echo.MiddlewareFunc {
@@ -11,6 +12,7 @@ func LoggingMiddleware(logger *slog.Logger) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			start := time.Now()
 			err := next(c)
+
 			defer func() {
 				latency := time.Since(start)
 				logger.Info("completed request",
@@ -20,6 +22,7 @@ func LoggingMiddleware(logger *slog.Logger) echo.MiddlewareFunc {
 					"latency", latency.Milliseconds(),
 					"ip", c.RealIP())
 			}()
+
 			return err
 		}
 	}

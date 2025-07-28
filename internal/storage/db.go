@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -15,9 +16,10 @@ type DB struct {
 
 func NewDB(cfg *config.Config) (*DB, error) {
 	connStr := config.ConnStr(cfg)
+
 	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		return nil, fmt.Errorf("db connect error: %v\n", err)
+		return nil, fmt.Errorf("db connect error: %w\n", err)
 	}
 
 	return &DB{pool: pool}, nil

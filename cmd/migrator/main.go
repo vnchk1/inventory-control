@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/pressly/goose/v3"
 	"github.com/vnchk1/inventory-control/internal/config"
-	"log"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	}
 
 	connStr := config.MigratorConnStr(cfg)
+
 	connConfig, err := pgx.ParseConfig(connStr)
 	if err != nil {
 		log.Fatalf("Migrator: error parsing config: %v", err)

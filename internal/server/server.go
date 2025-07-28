@@ -3,11 +3,12 @@ package server
 import (
 	"context"
 	"errors"
+	"log/slog"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/vnchk1/inventory-control/internal/config"
 	"github.com/vnchk1/inventory-control/internal/middleware"
-	"log/slog"
-	"net/http"
 )
 
 type Server struct {
@@ -46,14 +47,17 @@ func (s *Server) Run() (err error) {
 			s.Logger.Error("server.Run: ", "error", err, "port", s.Config.ServerPort)
 		}
 	}()
+
 	return
 }
 
-func (s *Server) Stop(ctx context.Context) (err error) {
+func (s *Server) Stop() (err error) {
 	s.Logger.Info("Stopping server")
+
 	err = s.Echo.Shutdown(context.Background())
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		s.Logger.Error("server.Stop: ", "error", err, "port", s.Config.ServerPort)
 	}
+
 	return
 }

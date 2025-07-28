@@ -1,9 +1,10 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
+
+	"github.com/vnchk1/inventory-control/internal/models"
 )
 
 type MigratorConfig struct {
@@ -22,43 +23,43 @@ func LoadMigratorConfig() (*MigratorConfig, error) {
 	if dbUser := os.Getenv("DB_USER"); dbUser != "" {
 		config.DBUser = dbUser
 	} else {
-		return nil, errors.New("DB_USER is required")
+		return nil, models.ErrBadSSLMode
 	}
 
 	if dbPassword := os.Getenv("DB_PASSWORD"); dbPassword != "" {
 		config.DBPassword = dbPassword
 	} else {
-		return nil, errors.New("DB_PASSWORD is required")
+		return nil, models.ErrBadSSLMode
 	}
 
 	if dbHost := os.Getenv("DB_HOST"); dbHost != "" {
 		config.DBHost = dbHost
 	} else {
-		return nil, errors.New("DB_HOST is required")
+		return nil, models.ErrBadSSLMode
 	}
 
 	if dbPort := os.Getenv("DB_PORT"); dbPort != "" {
 		config.DBPort = dbPort
 	} else {
-		return nil, errors.New("DB_PORT is required")
+		return nil, models.ErrBadSSLMode
 	}
 
 	if dbName := os.Getenv("DB_NAME"); dbName != "" {
 		config.DBName = dbName
 	} else {
-		return nil, errors.New("DB_NAME is required")
+		return nil, models.ErrBadDBName
 	}
 
 	if dbSSLMode := os.Getenv("SSL_MODE"); dbSSLMode != "" {
 		config.DBSSLMode = dbSSLMode
 	} else {
-		return nil, errors.New("DB_SSL_MODE is required")
+		return nil, models.ErrBadSSLMode
 	}
 
 	if migrationsPath := os.Getenv("MIGRATIONS_PATH"); migrationsPath != "" {
 		config.MigrationsPath = migrationsPath
 	} else {
-		return nil, errors.New("MIGRATIONS_PATH is required")
+		return nil, models.ErrMigrationsNotProvided
 	}
 
 	return config, nil

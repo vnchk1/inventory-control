@@ -14,14 +14,10 @@ type DB struct {
 	pool *pgxpool.Pool
 }
 
-func connStr(cfg *config.Config) string {
-	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s",
-		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBSSLMode)
-}
-
 func NewDB(cfg *config.Config) (*DB, error) {
-	log.Println("Connecting to DB", connStr(cfg))
-	pool, err := pgxpool.New(context.Background(), connStr(cfg))
+	connStr := config.ConnStr(cfg)
+	log.Println("Connecting to DB", connStr)
+	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
 		return nil, fmt.Errorf("db connect error: %v\n", err)
 	}
@@ -35,6 +31,10 @@ func (d *DB) QueryRow(ctx context.Context, query string, args ...interface{}) pg
 
 func (d *DB) Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error) {
 	return d.pool.Exec(ctx, query, args...)
+}
+
+func (d *DB) BeginTx(ctx context.Context, opts pgx.TxOptions) (pgx.Tx, error) {
+	return d.pool.BeginTx(ctx, opts)
 }
 
 func (d *DB) Close(ctx context.Context) {

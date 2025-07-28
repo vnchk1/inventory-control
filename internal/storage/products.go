@@ -16,7 +16,7 @@ func NewProductStorage(db *DB) *ProductStorage {
 
 func (p *ProductStorage) Create(ctx context.Context, product models.Product) (err error) {
 	query := `
-	INSERT INTO products (product_name, price, quantity, category_id) 
+	INSERT INTO products (product_name, price, quantity, category_id)
 	VALUES ($1, $2, $3, $4) RETURNING product_id`
 
 	err = p.pool.QueryRow(
@@ -26,8 +26,7 @@ func (p *ProductStorage) Create(ctx context.Context, product models.Product) (er
 		product.Quantity,
 		product.CategoryID).Scan(&product.ID)
 	if err != nil {
-		err = fmt.Errorf("error inserting row: %w", err)
-		return
+		return fmt.Errorf("error inserting row: %w", err)
 	}
 
 	//logger.Debug("Product created",
@@ -81,8 +80,7 @@ func (p *ProductStorage) Update(ctx context.Context, product models.Product) (er
 		product.CategoryID,
 		product.ID)
 	if err != nil {
-		err = fmt.Errorf("error updating row: %w", err)
-		return
+		return fmt.Errorf("error updating row: %w", err)
 	}
 
 	//logger.Debug("Product updated",
@@ -105,8 +103,7 @@ func (p *ProductStorage) Delete(ctx context.Context, id int) (err error) {
 	}
 
 	if result.RowsAffected() == 0 {
-		err = fmt.Errorf("row not found")
-		return
+		return fmt.Errorf("row not found")
 	}
 
 	//logger.Debug("Product deleted",

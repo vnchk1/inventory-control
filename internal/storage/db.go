@@ -33,10 +33,6 @@ func (d *DB) Exec(ctx context.Context, query string, args ...interface{}) (pgcon
 	return d.pool.Exec(ctx, query, args...)
 }
 
-func (d *DB) BeginTx(ctx context.Context, opts pgx.TxOptions) (pgx.Tx, error) {
-	return d.pool.BeginTx(ctx, opts)
-}
-
 func (d *DB) GetConnString() string {
 	return d.pool.Config().ConnString()
 }

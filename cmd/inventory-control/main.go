@@ -14,6 +14,10 @@ import (
 	logging "github.com/vnchk1/inventory-control/internal/logger"
 )
 
+const (
+	ShutdownTimeoutSeconds = 5
+)
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -24,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading config: %v\n", err)
 	}
-	// логгер
+
 	logger := logging.NewLogger(cfg.LogLevel)
 
 	app := apppkg.NewApp(cfg, logger)
@@ -34,14 +38,13 @@ func main() {
 		log.Fatalf("Error starting server: %v\n", err)
 	}
 
-	// graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	<-quit
 	logger.Info("Shutting down app...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), ShutdownTimeoutSeconds*time.Second)
 	defer cancel()
 
 	app.Stop(ctx)

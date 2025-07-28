@@ -25,6 +25,8 @@ goosedown:
 lint:
 	golangci-lint run
 
+lint-fix:
+	golangci-lint run --fix
 
 swag:
 	swag init -g $(MAIN_PATH) --output docs

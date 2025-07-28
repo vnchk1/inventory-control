@@ -8,10 +8,10 @@ import (
 )
 
 type ProductRepo interface {
-	Create(context.Context, models.Product) error
-	Read(context.Context, int) (models.Product, error)
-	Update(context.Context, models.Product) error
-	Delete(context.Context, int) error
+	Create(ctx context.Context, product models.Product) error
+	Read(ctx context.Context, id int) (models.Product, error)
+	Update(ctx context.Context, product models.Product) error
+	Delete(ctx context.Context, id int) error
 }
 
 type Products struct {

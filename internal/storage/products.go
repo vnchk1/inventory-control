@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+
 	"github.com/vnchk1/inventory-control/internal/models"
 )
 
@@ -45,6 +46,7 @@ func (p *ProductStorage) Read(ctx context.Context, id int) (product models.Produ
 		&product.CategoryID)
 	if err != nil {
 		err = fmt.Errorf("row SELECT error: %w", err)
+
 		return
 	}
 
@@ -78,6 +80,7 @@ func (p *ProductStorage) Delete(ctx context.Context, id int) (err error) {
 	result, err := p.pool.Exec(ctx, query, id)
 	if err != nil {
 		err = fmt.Errorf("row DELETE error: %w", err)
+
 		return
 	}
 

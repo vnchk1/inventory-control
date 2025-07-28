@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
+	"log/slog"
+
 	"github.com/vnchk1/inventory-control/internal/config"
 	serverpkg "github.com/vnchk1/inventory-control/internal/server"
 	productservice "github.com/vnchk1/inventory-control/internal/services"
 	"github.com/vnchk1/inventory-control/internal/storage"
-	"log/slog"
 )
 
 type App struct {
@@ -20,6 +21,7 @@ func NewApp(cfg *config.Config, logger *slog.Logger) *App {
 	if err != nil {
 		logger.Error("Error connecting to DB: %v\n", "error", err)
 	}
+
 	logger.Info("Connected to DB", "conn string", pool.GetConnString())
 
 	productStorage := storage.NewProductStorage(pool)
@@ -30,6 +32,7 @@ func NewApp(cfg *config.Config, logger *slog.Logger) *App {
 	logger.Info("Starting server", "port", server.Config.ServerPort)
 
 	server.RegisterRoutes(handlers)
+
 	return &App{
 		Server: server,
 		DB:     pool,
@@ -41,8 +44,10 @@ func (p *App) Run() (err error) {
 	err = p.Server.Run()
 	if err != nil {
 		p.Logger.Error("app.Run: %v\n", "error", err)
+
 		return
 	}
+
 	return
 }
 
@@ -60,6 +65,7 @@ func (p *App) Stop(ctx context.Context) {
 		if err != nil {
 			p.Logger.Error("server.Stop: ", "error", err)
 		}
+
 		p.Logger.Info("App shut down...")
 	case <-ctx.Done():
 		p.Logger.Warn("App stoped forced by timeout")

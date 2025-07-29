@@ -1,0 +1,39 @@
+###########################
+#1 Сборочный этап (builder)
+###########################
+FROM golang:1.24-alpine AS builder
+LABEL stage=builder
+
+#1.1 Рабочая директория внутри контейнера
+WORKDIR /app
+
+#1.2 Копируем файлы с зависимостями и скачиваем модули
+COPY go.mod go.sum ./
+RUN go mod download
+
+#1.3 Копируем исходники приложения
+COPY . .
+
+#1.4 Собираем приложение
+RUN go build -o migrator ./cmd/migrator
+
+#########################
+#2 Финальный легкий образ приложения
+#########################
+
+#2.1
+FROM alpine:latest
+
+#2.2 Рабочая директория внутри контейнера
+WORKDIR /app
+
+#2.3 миграции
+COPY --from=builder /app/migrations ./migrations
+#2.4 приложение
+COPY --from=builder /app/migrator ./
+
+COPY --from=builder /app/configs ./configs
+
+
+#2.5 Запуск
+ENTRYPOINT [ "./migrator" ]

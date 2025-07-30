@@ -4,7 +4,6 @@
 *.exe
 *.out
 *.bin
-*.env
 # Файлы зависимостей Go
 /vendor/
 

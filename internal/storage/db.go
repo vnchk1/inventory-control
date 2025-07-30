@@ -33,10 +33,10 @@ func (d *DB) Exec(ctx context.Context, query string, args ...interface{}) (pgcon
 	return d.pool.Exec(ctx, query, args...)
 }
 
-func (d *DB) GetConnString() string {
-	return d.pool.Config().ConnString()
+func (d *DB) GetConnString(cfg *config.Config) string {
+	return config.ConnStr(cfg)
 }
 
-func (d *DB) Close(ctx context.Context) {
+func (d *DB) Close() {
 	d.pool.Close()
 }

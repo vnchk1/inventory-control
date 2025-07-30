@@ -22,7 +22,7 @@ func NewApp(cfg *config.Config, logger *slog.Logger) *App {
 		logger.Error("Error connecting to DB: %v\n", "error", err)
 	}
 
-	logger.Info("Connected to DB", "conn string", pool.GetConnString())
+	logger.Info("Connected to DB", "conn string", pool.GetConnString(cfg))
 
 	productStorage := storage.NewProductStorage(pool)
 	productService := productservice.NewProductService(productStorage)
@@ -53,7 +53,7 @@ func (p *App) Run() (err error) {
 
 func (p *App) Stop(ctx context.Context) {
 	p.Logger.Info("DB pool closing...")
-	p.DB.Close(ctx)
+	p.DB.Close()
 
 	doneChan := make(chan error)
 	go func() {

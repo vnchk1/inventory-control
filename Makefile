@@ -13,7 +13,7 @@ build:
 
 run:
 	@echo "Running the app..."
-	go run $(MAIN_PATH)
+	set CONFIG_PATH=configs/.env && go run $(MAIN_PATH)
 
 migrate-build:
 	@echo "Building migrations..."
@@ -21,11 +21,10 @@ migrate-build:
 
 migrate-run:
 	@echo "Running migrations"
-	go run $(MIGRATOR_PATH)
+	set CONFIG_PATH=configs/.env && go run $(MIGRATOR_PATH)
 
 goosedown:
 	goose -dir migrations postgres postgres://postgres:postgres@localhost:5432/inventory_control?sslmode=disable down
-
 
 lint:
 	golangci-lint run

@@ -32,6 +32,10 @@ func NewServer(cfg *config.Config, logger *slog.Logger) *Server {
 }
 
 func (s *Server) RegisterRoutes(h *Handlers) {
+	categoryGroup := s.Echo.Group("/categories")
+
+	categoryGroup.POST("/create", h.Categories.Create)
+
 	productGroup := s.Echo.Group("/products")
 
 	productGroup.GET("/:id", h.Products.Read)

@@ -37,10 +37,6 @@ func (c *Products) Create(ctx context.Context, product models.Product) (err erro
 		return models.NewNegativeErr("quantity")
 	}
 
-	if product.CategoryID <= 0 {
-		return models.NewEmptyErr("category_id")
-	}
-
 	err = c.Storage.Create(ctx, product)
 	if err != nil {
 		return fmt.Errorf("storage.products.Create: %w", err)

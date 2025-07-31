@@ -5,11 +5,13 @@ import (
 )
 
 type Handlers struct {
-	Products *ProductHandler
+	Categories *CategoryHandler
+	Products   *ProductHandler
 }
 
-func NewHandlers(products ProductService, logger *slog.Logger) *Handlers {
+func NewHandlers(categories CategoryUseCase, products ProductService, logger *slog.Logger) *Handlers {
 	return &Handlers{
-		Products: NewProductHandler(products, logger),
+		Categories: NewCategoryHandler(categories, logger),
+		Products:   NewProductHandler(products, logger),
 	}
 }

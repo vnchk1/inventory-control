@@ -2,42 +2,51 @@ package app
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/vnchk1/inventory-control/internal/config"
-	serverpkg "github.com/vnchk1/inventory-control/internal/server"
-	productservice "github.com/vnchk1/inventory-control/internal/services"
+	"github.com/vnchk1/inventory-control/internal/server"
+	"github.com/vnchk1/inventory-control/internal/services"
 	"github.com/vnchk1/inventory-control/internal/storage"
 )
 
+var ErrDBConnectionFailed = errors.New("DB connection failed")
+
 type App struct {
-	Server *serverpkg.Server
+	Server *server.Server
 	DB     *storage.DB
 	Logger *slog.Logger
 }
 
-func NewApp(cfg *config.Config, logger *slog.Logger) *App {
+func NewApp(cfg *config.Config, logger *slog.Logger) (*App, error) {
 	pool, err := storage.NewDB(cfg)
 	if err != nil {
 		logger.Error("Error connecting to DB: %v\n", "error", err)
+
+		return nil, ErrDBConnectionFailed
 	}
 
-	logger.Info("Connected to DB", "conn string", pool.GetConnString(cfg))
+	logger.Debug("Connected to DB", "conn string", pool.GetConnString(cfg))
+
+	categoryStorage := storage.NewCategoryStorage(pool)
+	categoryService := services.NewCategoryService(categoryStorage)
 
 	productStorage := storage.NewProductStorage(pool)
-	productService := productservice.NewProductService(productStorage)
-	handlers := serverpkg.NewHandlers(productService, logger)
+	productService := services.NewProductService(productStorage)
 
-	server := serverpkg.NewServer(cfg, logger)
-	logger.Info("Starting server", "port", server.Config.ServerPort)
+	handlers := server.NewHandlers(categoryService, productService, logger)
 
-	server.RegisterRoutes(handlers)
+	newServer := server.NewServer(cfg, logger)
+	logger.Debug("Starting server", "port", newServer.Config.ServerPort)
+
+	newServer.RegisterRoutes(handlers)
 
 	return &App{
-		Server: server,
+		Server: newServer,
 		DB:     pool,
 		Logger: logger,
-	}
+	}, nil
 }
 
 func (p *App) Run() (err error) {

@@ -16,6 +16,19 @@ func NewProductStorage(db *DB) *ProductStorage {
 }
 
 func (p *ProductStorage) Create(ctx context.Context, product models.Product) (err error) {
+	var exists bool
+
+	err = p.pool.QueryRow(ctx,
+		`SELECT EXISTS(SELECT 1 FROM categories WHERE category_id=$1)`,
+		product.CategoryID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("checking category existence: %w", err)
+	}
+
+	if !exists {
+		return fmt.Errorf("category %d does not exist", product.CategoryID)
+	}
+
 	query := `
 	INSERT INTO products (product_name, price, quantity, category_id)
 	VALUES ($1, $2, $3, $4) RETURNING product_id`

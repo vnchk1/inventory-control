@@ -19,7 +19,7 @@ func LoggingMiddleware(logger *slog.Logger) echo.MiddlewareFunc {
 					"method", c.Request().Method,
 					"path", c.Request().URL.Path,
 					"status", c.Response().Status,
-					"latency", latency.Milliseconds(),
+					"latency_ms", latency.Milliseconds(),
 					"ip", c.RealIP())
 			}()
 

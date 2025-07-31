@@ -19,16 +19,14 @@ const (
 )
 
 func main() {
-	err := godotenv.Load()
+	_ = godotenv.Load()
+
 	cfgPath := os.Getenv("CONFIG_PATH")
 	if cfgPath == "" {
 		log.Fatalf("CONFIG_PATH is required")
 	}
 
-	err = godotenv.Load(cfgPath)
-	if err != nil {
-		log.Fatalf("Error loading .env file %v", err)
-	}
+	_ = godotenv.Load(cfgPath)
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -37,7 +35,10 @@ func main() {
 
 	logger := logging.NewLogger(cfg.LogLevel)
 
-	app := apppkg.NewApp(cfg, logger)
+	app, err := apppkg.NewApp(cfg, logger)
+	if err != nil {
+		log.Fatalf("Error creating app %v", err)
+	}
 
 	err = app.Run()
 	if err != nil {

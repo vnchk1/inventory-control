@@ -19,7 +19,7 @@ func NewDB(cfg *config.Config) (*DB, error) {
 
 	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		return nil, fmt.Errorf("db connect error: %w\n", err)
+		return nil, fmt.Errorf("db connect error: %w", err)
 	}
 
 	return &DB{pool: pool}, nil

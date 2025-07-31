@@ -13,15 +13,13 @@ import (
 
 func main() {
 	err := godotenv.Load()
+
 	cfgPath := os.Getenv("CONFIG_PATH")
 	if cfgPath == "" {
 		log.Fatalf("CONFIG_PATH is required")
 	}
 
-	err = godotenv.Load(cfgPath)
-	if err != nil {
-		log.Fatalf("Error loading .env file %v", err)
-	}
+	_ = godotenv.Load(cfgPath)
 
 	cfg, err := config.LoadMigratorConfig()
 	if err != nil {

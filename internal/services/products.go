@@ -14,17 +14,17 @@ type ProductRepo interface {
 	Delete(ctx context.Context, id int) error
 }
 
-type Products struct {
+type ProductService struct {
 	Storage ProductRepo
 }
 
-func NewProductService(storage ProductRepo) *Products {
-	return &Products{
+func NewProductService(storage ProductRepo) *ProductService {
+	return &ProductService{
 		Storage: storage,
 	}
 }
 
-func (c *Products) Create(ctx context.Context, product models.Product) (err error) {
+func (c *ProductService) Create(ctx context.Context, product models.Product) (err error) {
 	if product.Name == "" {
 		return models.NewEmptyErr("name")
 	}
@@ -45,7 +45,7 @@ func (c *Products) Create(ctx context.Context, product models.Product) (err erro
 	return
 }
 
-func (c *Products) Update(ctx context.Context, product models.Product) (err error) {
+func (c *ProductService) Update(ctx context.Context, product models.Product) (err error) {
 	if product.ID <= 0 {
 		return models.NewEmptyErr("id")
 	}
@@ -74,7 +74,7 @@ func (c *Products) Update(ctx context.Context, product models.Product) (err erro
 	return
 }
 
-func (c *Products) Delete(ctx context.Context, id int) (err error) {
+func (c *ProductService) Delete(ctx context.Context, id int) (err error) {
 	if id <= 0 {
 		return models.NewNegativeErr("id")
 	}
@@ -87,7 +87,7 @@ func (c *Products) Delete(ctx context.Context, id int) (err error) {
 	return
 }
 
-func (c *Products) Read(ctx context.Context, id int) (product models.Product, err error) {
+func (c *ProductService) Read(ctx context.Context, id int) (product models.Product, err error) {
 	product, err = c.Storage.Read(ctx, id)
 	if err != nil {
 		return models.Product{}, fmt.Errorf("storage.products.Read: %w", err)

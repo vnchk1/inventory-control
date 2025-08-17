@@ -18,6 +18,12 @@ type CategoryService struct {
 	Storage CategoryRepo
 }
 
+func NewCategoryService(storage CategoryRepo) *CategoryService {
+	return &CategoryService{
+		Storage: storage,
+	}
+}
+
 func (c *CategoryService) Read(ctx context.Context, id int) (category models.Category, err error) {
 	category, err = c.Storage.Read(ctx, id)
 	if err != nil {
@@ -27,20 +33,34 @@ func (c *CategoryService) Read(ctx context.Context, id int) (category models.Cat
 	return
 }
 
-func (c *CategoryService) Update(ctx context.Context, category models.Category) error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (c *CategoryService) Delete(ctx context.Context, id int) error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func NewCategoryService(storage CategoryRepo) *CategoryService {
-	return &CategoryService{
-		Storage: storage,
+func (c *CategoryService) Update(ctx context.Context, category models.Category) (err error) {
+	if category.ID <= 0 {
+		return models.NewEmptyErr("id")
 	}
+
+	if category.Name == "" {
+		return models.NewEmptyErr("name")
+	}
+
+	err = c.Storage.Update(ctx, category)
+	if err != nil {
+		return fmt.Errorf("storage.categories.Update: %w", err)
+	}
+
+	return
+}
+
+func (c *CategoryService) Delete(ctx context.Context, id int) (err error) {
+	if id <= 0 {
+		return models.NewNegativeErr("id")
+	}
+
+	err = c.Storage.Delete(ctx, id)
+	if err != nil {
+		return fmt.Errorf("storage.categories.Delete: %w", err)
+	}
+
+	return
 }
 
 func (c *CategoryService) Create(ctx context.Context, category models.Category) (err error) {

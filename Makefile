@@ -3,7 +3,7 @@ MIGRATOR_NAME := migrator
 MAIN_PATH := ./cmd/inventory-control
 MIGRATOR_PATH := ./cmd/migrator
 
-.PHONY: all build run swag fmt lint lint-fix test tidy docker-build docker-testrun docker-run mdocker-build mdocker-run migrate-build migrate-run
+.PHONY: all build run clean swag fmt lint lint-fix test tidy docker-build docker-testrun docker-run mdocker-build mdocker-run migrate-build migrate-run
 
 all: build
 
@@ -22,6 +22,9 @@ migrate-build:
 migrate-run:
 	@echo "Running migrations"
 	go run $(MIGRATOR_PATH)
+
+clean:
+	del /q "bin\*"
 
 goosedown:
 	goose -dir migrations postgres postgres://postgres:postgres@localhost:5432/inventory_control?sslmode=disable down

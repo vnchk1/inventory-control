@@ -36,6 +36,8 @@ func (s *Server) RegisterRoutes(h *Handlers) {
 
 	categoryGroup.GET("/:id", h.Categories.Read)
 	categoryGroup.POST("/create", h.Categories.Create)
+	categoryGroup.PUT("/update", h.Categories.Update)
+	categoryGroup.DELETE("/:id", h.Categories.Delete)
 
 	productGroup := s.Echo.Group("/products")
 

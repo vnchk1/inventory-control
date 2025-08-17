@@ -9,7 +9,7 @@ type Handlers struct {
 	Products   *ProductHandler
 }
 
-func NewHandlers(categories CategoryUseCase, products ProductService, logger *slog.Logger) *Handlers {
+func NewHandlers(categories CategoryUseCase, products ProductUseCase, logger *slog.Logger) *Handlers {
 	return &Handlers{
 		Categories: NewCategoryHandler(categories, logger),
 		Products:   NewProductHandler(products, logger),

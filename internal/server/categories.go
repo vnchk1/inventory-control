@@ -48,7 +48,7 @@ func (p *CategoryHandler) Create(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
-	return c.JSON(http.StatusCreated, http.StatusCreated)
+	return c.JSON(http.StatusCreated, http.StatusText(http.StatusCreated))
 }
 
 func (p *CategoryHandler) Read(c echo.Context) error {
@@ -67,4 +67,40 @@ func (p *CategoryHandler) Read(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, product)
+}
+
+func (p *CategoryHandler) Update(c echo.Context) error {
+	var req models.Category
+
+	err := c.Bind(&req)
+	if err != nil {
+		p.Logger.Error("error parsing JSON", "error", err)
+
+		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
+	}
+
+	err = p.Service.Update(c.Request().Context(), req)
+	if err != nil {
+		p.Logger.Error("services.categories.Update", "error", err)
+
+		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+	}
+
+	return c.JSON(http.StatusCreated, http.StatusText(http.StatusCreated))
+}
+
+func (p *CategoryHandler) Delete(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		p.Logger.Error("Invalid ID", "error", err)
+	}
+
+	err = p.Service.Delete(c.Request().Context(), id)
+	if err != nil {
+		p.Logger.Error("services.categories.Delete", "error", err)
+
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+	}
+
+	return c.JSON(http.StatusNoContent, http.StatusText(http.StatusNoContent))
 }

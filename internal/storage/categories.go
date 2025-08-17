@@ -28,14 +28,35 @@ func (c *CategoryStorage) Read(ctx context.Context, id int) (category models.Cat
 	return
 }
 
-func (c *CategoryStorage) Update(ctx context.Context, category models.Category) error {
-	// TODO implement me
-	panic("implement me")
+func (c *CategoryStorage) Update(ctx context.Context, category models.Category) (err error) {
+	query := `UPDATE categories SET 
+		category_name = $1
+		WHERE category_id = $2`
+
+	_, err = c.pool.Exec(ctx, query,
+		category.Name, category.ID)
+	if err != nil {
+		return fmt.Errorf("row UPDATE error: %w", err)
+	}
+
+	return
 }
 
-func (c *CategoryStorage) Delete(ctx context.Context, id int) error {
-	// TODO implement me
-	panic("implement me")
+func (c *CategoryStorage) Delete(ctx context.Context, id int) (err error) {
+	query := `DELETE FROM categories WHERE category_id = $1`
+
+	result, err := c.pool.Exec(ctx, query, id)
+	if err != nil {
+		err = fmt.Errorf("row DELETE error: %w", err)
+
+		return
+	}
+
+	if result.RowsAffected() == 0 {
+		return models.ErrNotFound
+	}
+
+	return
 }
 
 func NewCategoryStorage(pool *DB) *CategoryStorage {

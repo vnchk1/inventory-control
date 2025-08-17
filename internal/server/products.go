@@ -11,7 +11,7 @@ import (
 )
 
 type (
-	ProductService interface {
+	ProductUseCase interface {
 		Create(ctx context.Context, product models.Product) error
 		Read(ctx context.Context, id int) (models.Product, error)
 		Update(ctx context.Context, product models.Product) error
@@ -19,12 +19,12 @@ type (
 	}
 
 	ProductHandler struct {
-		Service ProductService
+		Service ProductUseCase
 		Logger  *slog.Logger
 	}
 )
 
-func NewProductHandler(service ProductService, logger *slog.Logger) *ProductHandler {
+func NewProductHandler(service ProductUseCase, logger *slog.Logger) *ProductHandler {
 	return &ProductHandler{
 		Service: service,
 		Logger:  logger,

@@ -6,6 +6,7 @@ import (
 	"github.com/vnchk1/inventory-control/internal/models"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
 
 type (
@@ -40,11 +41,30 @@ func (p *CategoryHandler) Create(c echo.Context) error {
 	}
 
 	err = p.Service.Create(c.Request().Context(), req)
+
 	if err != nil {
 		p.Logger.Error("services.categories.Create", "error", err)
 
 		return c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
-	return c.JSON(http.StatusCreated, req)
+	return c.JSON(http.StatusCreated, http.StatusCreated)
+}
+
+func (p *CategoryHandler) Read(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		p.Logger.Error("Invalid ID", "error", err)
+
+		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
+	}
+
+	product, err := p.Service.Read(c.Request().Context(), id)
+	if err != nil {
+		p.Logger.Error("services.categories.Read", "error", err)
+
+		return c.JSON(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+	}
+
+	return c.JSON(http.StatusOK, product)
 }

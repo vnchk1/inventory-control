@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	_ = godotenv.Load()
 
 	cfgPath := os.Getenv("CONFIG_PATH")
 	if cfgPath == "" {

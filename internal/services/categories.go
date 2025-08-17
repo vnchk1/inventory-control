@@ -18,9 +18,13 @@ type CategoryService struct {
 	Storage CategoryRepo
 }
 
-func (c *CategoryService) Read(ctx context.Context, id int) (models.Category, error) {
-	// TODO implement me
-	panic("implement me")
+func (c *CategoryService) Read(ctx context.Context, id int) (category models.Category, err error) {
+	category, err = c.Storage.Read(ctx, id)
+	if err != nil {
+		return models.Category{}, fmt.Errorf("storage.categories.Read: %w", err)
+	}
+
+	return
 }
 
 func (c *CategoryService) Update(ctx context.Context, category models.Category) error {
@@ -45,6 +49,7 @@ func (c *CategoryService) Create(ctx context.Context, category models.Category) 
 	}
 
 	err = c.Storage.Create(ctx, category)
+
 	if err != nil {
 		return fmt.Errorf("storage.categories.Create: %w", err)
 	}

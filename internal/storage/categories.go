@@ -11,9 +11,21 @@ type CategoryStorage struct {
 	pool *DB
 }
 
-func (c *CategoryStorage) Read(ctx context.Context, id int) (models.Category, error) {
-	// TODO implement me
-	panic("implement me")
+func (c *CategoryStorage) Read(ctx context.Context, id int) (category models.Category, err error) {
+	query := `
+	SELECT * FROM categories WHERE category_id = $1`
+
+	err = c.pool.QueryRow(
+		ctx, query,
+		id).Scan(&category.ID,
+		&category.Name)
+	if err != nil {
+		err = fmt.Errorf("row SELECT error: %w", err)
+
+		return
+	}
+
+	return
 }
 
 func (c *CategoryStorage) Update(ctx context.Context, category models.Category) error {
@@ -33,12 +45,13 @@ func NewCategoryStorage(pool *DB) *CategoryStorage {
 func (c *CategoryStorage) Create(ctx context.Context, category models.Category) (err error) {
 	query := `
 	INSERT INTO categories (category_name)
-	VALUES ($1) RETURNING category_id`
+	VALUES ($1) RETURNING (category_id)`
 
 	err = c.pool.QueryRow(
 		ctx, query,
 		category.Name,
 	).Scan(&category.ID)
+
 	if err != nil {
 		return fmt.Errorf("row INSERT error: %w", err)
 	}

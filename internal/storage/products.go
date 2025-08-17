@@ -49,7 +49,6 @@ func (p *ProductStorage) Create(ctx context.Context, product models.Product) (er
 func (p *ProductStorage) Read(ctx context.Context, id int) (product models.Product, err error) {
 	query := `
 	SELECT * FROM products WHERE product_id = $1`
-
 	err = p.pool.QueryRow(
 		ctx, query,
 		id).Scan(&product.ID,

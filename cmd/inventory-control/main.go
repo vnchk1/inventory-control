@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 	"os/signal"
@@ -54,5 +55,14 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), ShutdownTimeoutSeconds*time.Second)
 	defer cancel()
 
-	app.Stop(ctx)
+	err = app.Stop(ctx)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			logger.Warn("Shutdown timed out - some resources may not be fully released")
+		} else {
+			logger.Error("Shutdown failed:", err)
+		}
+	} else {
+		logger.Info("Graceful shutdown completed")
+	}
 }

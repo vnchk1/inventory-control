@@ -58,13 +58,12 @@ func (s *Server) Run() (err error) {
 	return
 }
 
-func (s *Server) Stop() (err error) {
-	s.Logger.Info("Stopping server")
-
-	err = s.Echo.Shutdown(context.Background())
+func (s *Server) Stop(ctx context.Context) (err error) {
+	err = s.Echo.Shutdown(ctx)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		s.Logger.Error("server.Stop: ", "error", err, "port", s.Config.ServerPort)
 	}
+	s.Logger.Info("Server stopped")
 
 	return
 }

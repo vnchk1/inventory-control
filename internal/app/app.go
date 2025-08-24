@@ -60,23 +60,27 @@ func (p *App) Run() (err error) {
 	return
 }
 
-func (p *App) Stop(ctx context.Context) {
-	p.Logger.Info("DB pool closing...")
-	p.DB.Close()
+func (p *App) Stop(ctx context.Context) (err error) {
+	p.Logger.Info("Server stopping...")
+	if err = p.Server.Stop(ctx); err != nil {
+		p.Logger.Error("app.Stop: ", "error", err)
+		return
+	}
 
-	doneChan := make(chan error)
+	p.Logger.Info("DB pool closing...")
+	dbClosed := make(chan struct{})
 	go func() {
-		doneChan <- p.Server.Stop()
+		defer close(dbClosed)
+		p.DB.Close()
 	}()
 
 	select {
-	case err := <-doneChan:
-		if err != nil {
-			p.Logger.Error("server.Stop: ", "error", err)
-		}
-
-		p.Logger.Info("App shut down...")
+	case <-dbClosed:
+		p.Logger.Info("DB closed successfully")
 	case <-ctx.Done():
-		p.Logger.Warn("App stoped forced by timeout")
+		p.Logger.Warn("DB close interrupted by context timeout")
+		return ctx.Err()
 	}
+
+	return nil
 }

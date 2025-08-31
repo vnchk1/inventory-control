@@ -3,7 +3,7 @@ MIGRATOR_NAME := migrator
 MAIN_PATH := ./cmd/inventory-control
 MIGRATOR_PATH := ./cmd/migrator
 
-.PHONY: all build run clean swag fmt lint lint-fix test tidy docker-build docker-testrun docker-run mdocker-build mdocker-run migrate-build migrate-run
+.PHONY: all build run clean swag lint lint-fix test docker-build docker-testrun docker-run mdocker-build mdocker-run migrate-build migrate-run
 
 all: build
 
@@ -38,14 +38,8 @@ lint-fix:
 swag:
 	swag init -g $(MAIN_PATH) --output docs
 
-fmt:
-	go fmt ./...
-
 test:
 	go test ./... -v
-
-tidy:
-	go mod tidy
 
 docker-build:
 	docker build -t inventory-control:latest -f Dockerfile.inventory-control .

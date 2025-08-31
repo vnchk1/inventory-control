@@ -31,6 +31,7 @@ func NewProductHandler(service ProductUseCase, logger *slog.Logger) *ProductHand
 	}
 }
 
+//nolint:varnamelen
 func (p *ProductHandler) Create(c echo.Context) error {
 	var req models.Product
 
@@ -51,6 +52,7 @@ func (p *ProductHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, req)
 }
 
+//nolint:varnamelen
 func (p *ProductHandler) Read(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -69,6 +71,7 @@ func (p *ProductHandler) Read(c echo.Context) error {
 	return c.JSON(http.StatusOK, product)
 }
 
+//nolint:varnamelen
 func (p *ProductHandler) Update(c echo.Context) error {
 	var req models.Product
 
@@ -89,6 +92,7 @@ func (p *ProductHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusCreated, req)
 }
 
+//nolint:varnamelen
 func (p *ProductHandler) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

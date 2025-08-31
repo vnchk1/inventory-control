@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
-	"github.com/vnchk1/inventory-control/internal/models"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
+
+	"github.com/vnchk1/inventory-control/internal/models"
 )
 
 type (
@@ -30,6 +32,7 @@ func NewCategoryHandler(uc CategoryUseCase, logger *slog.Logger) *CategoryHandle
 	}
 }
 
+//nolint:varnamelen
 func (p *CategoryHandler) Create(c echo.Context) error {
 	var req models.Category
 
@@ -51,6 +54,7 @@ func (p *CategoryHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, http.StatusText(http.StatusCreated))
 }
 
+//nolint:varnamelen
 func (p *CategoryHandler) Read(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -69,6 +73,7 @@ func (p *CategoryHandler) Read(c echo.Context) error {
 	return c.JSON(http.StatusOK, product)
 }
 
+//nolint:varnamelen
 func (p *CategoryHandler) Update(c echo.Context) error {
 	var req models.Category
 
@@ -89,6 +94,7 @@ func (p *CategoryHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusCreated, http.StatusText(http.StatusCreated))
 }
 
+//nolint:varnamelen
 func (p *CategoryHandler) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

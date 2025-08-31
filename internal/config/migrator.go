@@ -21,46 +21,33 @@ type MigratorConfig struct {
 func LoadMigratorConfig() (*MigratorConfig, error) {
 	config := &MigratorConfig{}
 
-	if dbUser := os.Getenv("DB_USER"); dbUser != "" {
-		config.DBUser = dbUser
-	} else {
-		return nil, ErrBadSSLMode
+	envConfigs := map[string]*string{
+		"DB_USER":         &config.DBUser,
+		"DB_PASSWORD":     &config.DBPassword,
+		"DB_HOST":         &config.DBHost,
+		"DB_PORT":         &config.DBPort,
+		"DB_NAME":         &config.DBName,
+		"SSL_MODE":        &config.DBSSLMode,
+		"MIGRATIONS_PATH": &config.MigrationsPath,
 	}
 
-	if dbPassword := os.Getenv("DB_PASSWORD"); dbPassword != "" {
-		config.DBPassword = dbPassword
-	} else {
-		return nil, ErrBadSSLMode
+	envErrors := map[string]error{
+		"DB_USER":         ErrBadUserName,
+		"DB_PASSWORD":     ErrBadPassword,
+		"DB_HOST":         ErrBadHost,
+		"DB_PORT":         ErrBadDBPort,
+		"DB_NAME":         ErrBadDBName,
+		"SSL_MODE":        ErrBadSSLMode,
+		"MIGRATIONS_PATH": ErrMigrationsNotProvided,
 	}
 
-	if dbHost := os.Getenv("DB_HOST"); dbHost != "" {
-		config.DBHost = dbHost
-	} else {
-		return nil, ErrBadSSLMode
-	}
+	for envName, configField := range envConfigs {
+		value := os.Getenv(envName)
+		if value == "" {
+			return nil, envErrors[envName]
+		}
 
-	if dbPort := os.Getenv("DB_PORT"); dbPort != "" {
-		config.DBPort = dbPort
-	} else {
-		return nil, ErrBadSSLMode
-	}
-
-	if dbName := os.Getenv("DB_NAME"); dbName != "" {
-		config.DBName = dbName
-	} else {
-		return nil, ErrBadDBName
-	}
-
-	if dbSSLMode := os.Getenv("SSL_MODE"); dbSSLMode != "" {
-		config.DBSSLMode = dbSSLMode
-	} else {
-		return nil, ErrBadSSLMode
-	}
-
-	if migrationsPath := os.Getenv("MIGRATIONS_PATH"); migrationsPath != "" {
-		config.MigrationsPath = migrationsPath
-	} else {
-		return nil, ErrMigrationsNotProvided
+		*configField = value
 	}
 
 	return config, nil

@@ -31,6 +31,7 @@ func NewServer(cfg *config.Config, logger *slog.Logger) *Server {
 	}
 }
 
+//nolint:varnamelen
 func (s *Server) RegisterRoutes(h *Handlers) {
 	categoryGroup := s.Echo.Group("/categories")
 
@@ -63,7 +64,8 @@ func (s *Server) Stop(ctx context.Context) (err error) {
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		s.Logger.Error("server.Stop: ", "error", err, "port", s.Config.ServerPort)
 	}
-	s.Logger.Info("Server stopped")
 
-	return
+	s.Logger.Debug("Server stopped successfully")
+
+	return nil
 }

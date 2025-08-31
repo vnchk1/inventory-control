@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/vnchk1/inventory-control/internal/config"
 	"github.com/vnchk1/inventory-control/internal/server"
@@ -12,6 +16,10 @@ import (
 )
 
 var ErrDBConnectionFailed = errors.New("DB connection failed")
+
+const (
+	ShutdownTimeoutSeconds = 5
+)
 
 type App struct {
 	Server *server.Server
@@ -61,14 +69,18 @@ func (p *App) Run() (err error) {
 }
 
 func (p *App) Stop(ctx context.Context) (err error) {
-	p.Logger.Info("Server stopping...")
+	p.Logger.Debug("Server stopping...")
+
 	if err = p.Server.Stop(ctx); err != nil {
 		p.Logger.Error("app.Stop: ", "error", err)
+
 		return
 	}
 
-	p.Logger.Info("DB pool closing...")
+	p.Logger.Debug("DB pool closing...")
+
 	dbClosed := make(chan struct{})
+
 	go func() {
 		defer close(dbClosed)
 		p.DB.Close()
@@ -76,11 +88,34 @@ func (p *App) Stop(ctx context.Context) (err error) {
 
 	select {
 	case <-dbClosed:
-		p.Logger.Info("DB closed successfully")
+		p.Logger.Debug("DB closed successfully")
 	case <-ctx.Done():
 		p.Logger.Warn("DB close interrupted by context timeout")
+
 		return ctx.Err()
 	}
 
 	return nil
+}
+
+func Shutdown(app *App) {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+	app.Logger.Debug("Shutting down app...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), ShutdownTimeoutSeconds*time.Second)
+	defer cancel()
+
+	err := app.Stop(ctx)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			app.Logger.Warn("Shutdown timed out - some resources may not be fully released")
+		} else {
+			app.Logger.Error("Shutdown failed:", "error", err)
+		}
+	} else {
+		app.Logger.Debug("Graceful shutdown completed")
+	}
 }

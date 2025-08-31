@@ -31,52 +31,35 @@ type Config struct {
 func LoadConfig() (*Config, error) {
 	config := &Config{}
 
-	if logLvl := os.Getenv("LOG_LEVEL"); logLvl != "" {
-		config.LogLevel = logLvl
-	} else {
-		return nil, ErrBadLogLevel
+	envConfigs := map[string]*string{
+		"LOG_LEVEL":   &config.LogLevel,
+		"SERVER_PORT": &config.ServerPort,
+		"DB_USER":     &config.DBUser,
+		"DB_PASSWORD": &config.DBPassword,
+		"DB_HOST":     &config.DBHost,
+		"DB_PORT":     &config.DBPort,
+		"DB_NAME":     &config.DBName,
+		"SSL_MODE":    &config.DBSSLMode,
 	}
 
-	if serverPort := os.Getenv("SERVER_PORT"); serverPort != "" {
-		config.ServerPort = serverPort
-	} else {
-		return nil, ErrBadServerPort
+	envErrors := map[string]error{
+		"LOG_LEVEL":   ErrBadLogLevel,
+		"SERVER_PORT": ErrBadServerPort,
+		"DB_USER":     ErrBadUserName,
+		"DB_PASSWORD": ErrBadPassword,
+		"DB_HOST":     ErrBadHost,
+		"DB_PORT":     ErrBadDBPort,
+		"DB_NAME":     ErrBadDBName,
+		"SSL_MODE":    ErrBadSSLMode,
 	}
 
-	if dbUser := os.Getenv("DB_USER"); dbUser != "" {
-		config.DBUser = dbUser
-	} else {
-		return nil, ErrBadUserName
-	}
+	for envName, configField := range envConfigs {
+		value := os.Getenv(envName)
+		if value == "" {
+			return nil, envErrors[envName]
+		}
 
-	if dbPassword := os.Getenv("DB_PASSWORD"); dbPassword != "" {
-		config.DBPassword = dbPassword
-	} else {
-		return nil, ErrBadPassword
-	}
-
-	if dbHost := os.Getenv("DB_HOST"); dbHost != "" {
-		config.DBHost = dbHost
-	} else {
-		return nil, ErrBadHost
-	}
-
-	if dbPort := os.Getenv("DB_PORT"); dbPort != "" {
-		config.DBPort = dbPort
-	} else {
-		return nil, ErrBadDBPort
-	}
-
-	if dbName := os.Getenv("DB_NAME"); dbName != "" {
-		config.DBName = dbName
-	} else {
-		return nil, ErrBadDBName
-	}
-
-	if dbSSLMode := os.Getenv("SSL_MODE"); dbSSLMode != "" {
-		config.DBSSLMode = dbSSLMode
-	} else {
-		return nil, ErrBadSSLMode
+		*configField = value
 	}
 
 	return config, nil

@@ -25,6 +25,7 @@ func NewDB(cfg *config.Config) (*DB, error) {
 	return &DB{pool: pool}, nil
 }
 
+//nolint:ireturn // возвращаем pgx.Row для доступа ко всем методам pgx
 func (d *DB) QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
 	return d.pool.QueryRow(ctx, query, args...)
 }

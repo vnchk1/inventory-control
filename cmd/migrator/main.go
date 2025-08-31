@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/vnchk1/inventory-control/internal/models"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,11 +9,12 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/pressly/goose/v3"
+
 	"github.com/vnchk1/inventory-control/internal/config"
+	"github.com/vnchk1/inventory-control/internal/models"
 )
 
 func main() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Println(models.ErrEnvLoad)
@@ -34,21 +35,29 @@ func main() {
 		log.Fatalf("Error loading migrator config: %v\n", err)
 	}
 
+	if err = runMigrations(cfg); err != nil {
+		log.Fatalf("Error running migration: %v\n", err)
+	}
+}
+
+func runMigrations(cfg *config.MigratorConfig) (err error) {
 	connStr := config.MigratorConnStr(cfg)
 
 	connConfig, err := pgx.ParseConfig(connStr)
 	if err != nil {
-		log.Fatalf("Migrator: error parsing config: %v", err)
+		return fmt.Errorf("migrator: error parsing config: %w", err)
 	}
 
 	db := stdlib.OpenDB(*connConfig)
 	defer db.Close()
 
 	if err = goose.SetDialect("postgres"); err != nil {
-		log.Fatalf("Error setting postgres dialect: %v", err)
+		return fmt.Errorf("error setting postgres dialect: %w", err)
 	}
 
 	if err = goose.Up(db, cfg.MigrationsPath); err != nil {
-		log.Fatalf("Migrator: UP error: %v", err)
+		return fmt.Errorf("migrator: UP error: %w", err)
 	}
+
+	return nil
 }

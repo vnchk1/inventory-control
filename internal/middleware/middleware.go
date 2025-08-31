@@ -9,7 +9,7 @@ import (
 
 func LoggingMiddleware(logger *slog.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c echo.Context) error { //nolint:varnamelen
 			start := time.Now()
 			err := next(c)
 

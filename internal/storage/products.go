@@ -26,7 +26,7 @@ func (p *ProductStorage) Create(ctx context.Context, product models.Product) (er
 	}
 
 	if !exists {
-		return fmt.Errorf("category %d does not exist", product.CategoryID)
+		return models.NewErrNotFound("category", product.CategoryID)
 	}
 
 	query := `
@@ -56,6 +56,7 @@ func (p *ProductStorage) Read(ctx context.Context, id int) (product models.Produ
 		&product.Price,
 		&product.Quantity,
 		&product.CategoryID)
+
 	if err != nil {
 		err = fmt.Errorf("row SELECT error: %w", err)
 

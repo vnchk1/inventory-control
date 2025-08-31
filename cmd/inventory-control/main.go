@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/vnchk1/inventory-control/internal/models"
 	"log"
 	"os"
 	"os/signal"
@@ -10,7 +11,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	apppkg "github.com/vnchk1/inventory-control/internal/app"
+	inventoryApp "github.com/vnchk1/inventory-control/internal/app"
 	"github.com/vnchk1/inventory-control/internal/config"
 	logging "github.com/vnchk1/inventory-control/internal/logger"
 )
@@ -20,14 +21,20 @@ const (
 )
 
 func main() {
-	_ = godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(models.ErrEnvLoad)
+	}
 
 	cfgPath := os.Getenv("CONFIG_PATH")
 	if cfgPath == "" {
-		log.Fatalf("CONFIG_PATH is required")
+		log.Fatalf("main: %v", models.ErrCfgPath)
 	}
 
-	_ = godotenv.Load(cfgPath)
+	err = godotenv.Load(cfgPath)
+	if err != nil {
+		log.Println(models.ErrEnvLoad)
+	}
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -36,7 +43,7 @@ func main() {
 
 	logger := logging.NewLogger(cfg.LogLevel)
 
-	app, err := apppkg.NewApp(cfg, logger)
+	app, err := inventoryApp.NewApp(cfg, logger)
 	if err != nil {
 		log.Fatalf("Error creating app %v", err)
 	}

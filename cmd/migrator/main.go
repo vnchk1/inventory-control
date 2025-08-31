@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/vnchk1/inventory-control/internal/models"
 	"log"
 	"os"
 
@@ -12,18 +13,25 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load()
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(models.ErrEnvLoad)
+	}
 
 	cfgPath := os.Getenv("CONFIG_PATH")
 	if cfgPath == "" {
-		log.Fatalf("CONFIG_PATH is required")
+		log.Fatalf("main: %v", models.ErrCfgPath)
 	}
 
-	_ = godotenv.Load(cfgPath)
+	err = godotenv.Load(cfgPath)
+	if err != nil {
+		log.Println(models.ErrEnvLoad)
+	}
 
 	cfg, err := config.LoadMigratorConfig()
 	if err != nil {
-		log.Fatalf("Error loading migrator config %v", err)
+		log.Fatalf("Error loading migrator config: %v\n", err)
 	}
 
 	connStr := config.MigratorConnStr(cfg)

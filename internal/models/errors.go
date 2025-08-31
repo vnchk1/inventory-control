@@ -8,6 +8,8 @@ import (
 var (
 	ErrUnique   = errors.New("already exists")
 	ErrNotFound = errors.New("not found")
+	ErrEnvLoad  = errors.New("error loading .env file")
+	ErrCfgPath  = errors.New("CONFIG_PATH is required")
 )
 
 func NewEmptyErr(field string) error {

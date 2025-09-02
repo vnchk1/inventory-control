@@ -21,7 +21,7 @@ func main() {
 
 	err = app.Run()
 	if err != nil {
-		log.Fatalf("error starting server: %v\n", err)
+		log.Fatalf("error starting server: %v", err)
 	}
 
 	inventoryApp.Shutdown(app)
@@ -48,7 +48,7 @@ func Setup() (app *inventoryApp.App, err error) {
 		return nil, fmt.Errorf("error loading config: %w", err)
 	}
 
-	logger := logging.NewLogger(cfg.LogLevel)
+	logger := logging.NewLogger(cfg.Log.Level)
 
 	app, err = inventoryApp.NewApp(cfg, logger)
 	if err != nil {

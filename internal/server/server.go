@@ -50,9 +50,9 @@ func (s *Server) RegisterRoutes(h *Handlers) {
 
 func (s *Server) Run() (err error) {
 	go func() {
-		err = s.Echo.Start(":" + s.Config.ServerPort)
+		err = s.Echo.Start(":" + s.Config.Server.Port)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			s.Logger.Error("server.Run: ", "error", err, "port", s.Config.ServerPort)
+			s.Logger.Error("server.Run: ", "error", err, "port", s.Config.Server.Port)
 		}
 	}()
 
@@ -62,7 +62,7 @@ func (s *Server) Run() (err error) {
 func (s *Server) Stop(ctx context.Context) (err error) {
 	err = s.Echo.Shutdown(ctx)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		s.Logger.Error("server.Stop: ", "error", err, "port", s.Config.ServerPort)
+		s.Logger.Error("server.Stop: ", "error", err, "port", s.Config.Server.Port)
 	}
 
 	s.Logger.Debug("Server stopped successfully")

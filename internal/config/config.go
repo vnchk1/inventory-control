@@ -1,62 +1,63 @@
 package config
 
 import (
-	"errors"
 	"fmt"
+	"github.com/vnchk1/inventory-control/internal/models"
 	"os"
 )
 
-var (
-	ErrBadHost       = errors.New("host is required")
-	ErrBadServerPort = errors.New("server port is required")
-	ErrBadDBPort     = errors.New("db port is required")
-	ErrBadSSLMode    = errors.New("SSL_MODE is required")
-	ErrBadUserName   = errors.New("username is required")
-	ErrBadPassword   = errors.New("password is required")
-	ErrBadDBName     = errors.New("db name is required")
-	ErrBadLogLevel   = errors.New("log level is required")
-)
-
 type Config struct {
-	LogLevel   string
-	ServerPort string
-	DBUser     string
-	DBPassword string
-	DBHost     string
-	DBPort     string
-	DBName     string
-	DBSSLMode  string
+	Log      *LoggingConfig
+	Server   *ServerConfig
+	DB       *DatabaseConfig
+	Migrator *MigratorConfig
+}
+
+type LoggingConfig struct {
+	Level string
+}
+
+type ServerConfig struct {
+	Port string
+}
+
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+	SSLMode  string
+}
+
+type MigratorConfig struct {
+	Path string
 }
 
 func LoadConfig() (*Config, error) {
-	config := &Config{}
-
-	envConfigs := map[string]*string{
-		"LOG_LEVEL":   &config.LogLevel,
-		"SERVER_PORT": &config.ServerPort,
-		"DB_USER":     &config.DBUser,
-		"DB_PASSWORD": &config.DBPassword,
-		"DB_HOST":     &config.DBHost,
-		"DB_PORT":     &config.DBPort,
-		"DB_NAME":     &config.DBName,
-		"SSL_MODE":    &config.DBSSLMode,
+	config := &Config{
+		Log:      &LoggingConfig{},
+		Server:   &ServerConfig{},
+		DB:       &DatabaseConfig{},
+		Migrator: &MigratorConfig{},
 	}
 
-	envErrors := map[string]error{
-		"LOG_LEVEL":   ErrBadLogLevel,
-		"SERVER_PORT": ErrBadServerPort,
-		"DB_USER":     ErrBadUserName,
-		"DB_PASSWORD": ErrBadPassword,
-		"DB_HOST":     ErrBadHost,
-		"DB_PORT":     ErrBadDBPort,
-		"DB_NAME":     ErrBadDBName,
-		"SSL_MODE":    ErrBadSSLMode,
+	envConfigs := map[string]*string{
+		"LOG_LEVEL":       &config.Log.Level,
+		"SERVER_PORT":     &config.Server.Port,
+		"DB_USER":         &config.DB.Username,
+		"DB_PASSWORD":     &config.DB.Password,
+		"DB_HOST":         &config.DB.Host,
+		"DB_PORT":         &config.DB.Port,
+		"DB_NAME":         &config.DB.DBName,
+		"SSL_MODE":        &config.DB.SSLMode,
+		"MIGRATIONS_PATH": &config.Migrator.Path,
 	}
 
 	for envName, configField := range envConfigs {
 		value := os.Getenv(envName)
 		if value == "" {
-			return nil, envErrors[envName]
+			return nil, models.NewEmptyErr(envName)
 		}
 
 		*configField = value
@@ -67,5 +68,5 @@ func LoadConfig() (*Config, error) {
 
 func ConnStr(cfg *Config) string {
 	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=%s",
-		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBSSLMode)
+		cfg.DB.Username, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port, cfg.DB.DBName, cfg.DB.SSLMode)
 }

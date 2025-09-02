@@ -30,7 +30,7 @@ func main() {
 		log.Println(models.ErrEnvLoad)
 	}
 
-	cfg, err := config.LoadMigratorConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Error loading migrator config: %v\n", err)
 	}
@@ -40,8 +40,8 @@ func main() {
 	}
 }
 
-func runMigrations(cfg *config.MigratorConfig) (err error) {
-	connStr := config.MigratorConnStr(cfg)
+func runMigrations(cfg *config.Config) (err error) {
+	connStr := config.ConnStr(cfg)
 
 	connConfig, err := pgx.ParseConfig(connStr)
 	if err != nil {
@@ -55,7 +55,7 @@ func runMigrations(cfg *config.MigratorConfig) (err error) {
 		return fmt.Errorf("error setting postgres dialect: %w", err)
 	}
 
-	if err = goose.Up(db, cfg.MigrationsPath); err != nil {
+	if err = goose.Up(db, cfg.Migrator.Path); err != nil {
 		return fmt.Errorf("migrator: UP error: %w", err)
 	}
 

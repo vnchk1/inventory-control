@@ -46,7 +46,7 @@ func NewApp(cfg *config.Config, logger *slog.Logger) (*App, error) {
 	handlers := server.NewHandlers(categoryService, productService, logger)
 
 	newServer := server.NewServer(cfg, logger)
-	logger.Debug("Starting server", "port", newServer.Config.ServerPort)
+	logger.Debug("Starting server", "port", newServer.Config.Server.Port)
 
 	newServer.RegisterRoutes(handlers)
 

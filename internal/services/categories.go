@@ -8,7 +8,7 @@ import (
 )
 
 type CategoryRepo interface {
-	Create(ctx context.Context, category models.Category) error
+	Create(ctx context.Context, category *models.Category) error
 	Read(ctx context.Context, id int) (models.Category, error)
 	Update(ctx context.Context, category models.Category) error
 	Delete(ctx context.Context, id int) error
@@ -63,7 +63,7 @@ func (c *CategoryService) Delete(ctx context.Context, id int) (err error) {
 	return
 }
 
-func (c *CategoryService) Create(ctx context.Context, category models.Category) (err error) {
+func (c *CategoryService) Create(ctx context.Context, category *models.Category) (err error) {
 	if category.Name == "" {
 		return models.NewEmptyErr("name")
 	}

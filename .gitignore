@@ -29,3 +29,4 @@ Thumbs.db
 *.grpc.pb.go
 
 plan.txt
+prompt.txt

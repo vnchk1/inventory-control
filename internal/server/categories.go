@@ -13,7 +13,7 @@ import (
 
 type (
 	CategoryUseCase interface {
-		Create(ctx context.Context, category models.Category) error
+		Create(ctx context.Context, category *models.Category) error
 		Read(ctx context.Context, id int) (models.Category, error)
 		Update(ctx context.Context, category models.Category) error
 		Delete(ctx context.Context, id int) error
@@ -34,7 +34,7 @@ func NewCategoryHandler(uc CategoryUseCase, logger *slog.Logger) *CategoryHandle
 
 //nolint:varnamelen
 func (p *CategoryHandler) Create(c echo.Context) error {
-	var req models.Category
+	var req *models.Category
 
 	err := c.Bind(&req)
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 )
 
 type DB struct {
-	pool *pgxpool.Pool
+	Pool *pgxpool.Pool
 }
 
 func NewDB(cfg *config.Config) (*DB, error) {
@@ -22,16 +22,16 @@ func NewDB(cfg *config.Config) (*DB, error) {
 		return nil, fmt.Errorf("db connect error: %w", err)
 	}
 
-	return &DB{pool: pool}, nil
+	return &DB{Pool: pool}, nil
 }
 
 //nolint:ireturn // возвращаем pgx.Row для доступа ко всем методам pgx
 func (d *DB) QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
-	return d.pool.QueryRow(ctx, query, args...)
+	return d.Pool.QueryRow(ctx, query, args...)
 }
 
 func (d *DB) Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error) {
-	return d.pool.Exec(ctx, query, args...)
+	return d.Pool.Exec(ctx, query, args...)
 }
 
 func (d *DB) GetConnString(cfg *config.Config) string {
@@ -39,5 +39,10 @@ func (d *DB) GetConnString(cfg *config.Config) string {
 }
 
 func (d *DB) Close() {
-	d.pool.Close()
+	d.Pool.Close()
+}
+
+// В файле db.go
+func (d *DB) GetPool() *pgxpool.Pool {
+	return d.Pool
 }

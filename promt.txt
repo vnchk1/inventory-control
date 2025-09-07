@@ -1,0 +1,104 @@
+Конфиг:
+LOG_LEVEL=debug
+SERVER_PORT=8080
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=inventory_control
+SSL_MODE=disable
+MIGRATIONS_PATH=migrations
+
+БД:
+
+type DB struct {
+	pool *pgxpool.Pool
+}
+
+func NewDB(cfg *config.Config) (*DB, error) {
+	connStr := config.ConnStr(cfg)
+
+	pool, err := pgxpool.New(context.Background(), connStr)
+	if err != nil {
+		return nil, fmt.Errorf("db connect error: %w", err)
+	}
+
+	return &DB{pool: pool}, nil
+}
+
+//nolint:ireturn // возвращаем pgx.Row для доступа ко всем методам pgx
+func (d *DB) QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
+	return d.pool.QueryRow(ctx, query, args...)
+}
+
+func (d *DB) Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error) {
+	return d.pool.Exec(ctx, query, args...)
+}
+
+func (d *DB) GetConnString(cfg *config.Config) string {
+	return config.ConnStr(cfg)
+}
+
+func (d *DB) Close() {
+	d.pool.Close()
+}
+
+Функция:
+
+func (c *CategoryStorage) Create(ctx context.Context, category models.Category) (err error) {
+	query := `
+	INSERT INTO categories (category_name)
+	VALUES ($1) RETURNING (category_id)`
+
+	err = c.pool.QueryRow(
+		ctx, query,
+		category.Name,
+	).Scan(&category.ID)
+
+	if err != nil {
+		return fmt.Errorf("row INSERT error: %w", err)
+	}
+
+	return
+}
+
+
+первый файл: 20250728211107_new_categories_table.sql
+
+-- +goose Up
+-- +goose StatementBegin
+SELECT 'up SQL query';
+CREATE TABLE IF NOT EXISTS categories (
+    category_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL UNIQUE
+);
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+SELECT 'down SQL query';
+DROP TABLE IF EXISTS categories;
+-- +goose StatementEnd
+
+второй файл: 20250728214826_new_products_table.sql
+
+-- +goose Up
+-- +goose StatementBegin
+SELECT 'up SQL query';
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL UNIQUE,
+    price INTEGER NOT NULL DEFAULT 0,
+    quantity INTEGER NOT NULL DEFAULT 0,
+    category_id INTEGER,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+SELECT 'down SQL query';
+DROP TABLE IF EXISTS products;
+-- +goose StatementEnd

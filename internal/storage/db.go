@@ -41,8 +41,3 @@ func (d *DB) GetConnString(cfg *config.Config) string {
 func (d *DB) Close() {
 	d.Pool.Close()
 }
-
-// В файле db.go
-func (d *DB) GetPool() *pgxpool.Pool {
-	return d.Pool
-}

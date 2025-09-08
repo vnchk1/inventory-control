@@ -11,6 +11,7 @@ var (
 	ErrCfgPath       = errors.New("CONFIG_PATH is required")
 	ErrFieldRequired = errors.New("field is required")
 	ErrNegative      = errors.New("cannot be negative")
+	ErrTooManyItems  = errors.New("too many items")
 )
 
 func NewEmptyErr(field string) error {

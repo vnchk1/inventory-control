@@ -33,10 +33,14 @@ func (c *CategoryStorage) Update(ctx context.Context, category models.Category) 
 		category_name = $1
 		WHERE category_id = $2`
 
-	_, err = c.Pool.Exec(ctx, query,
+	tag, err := c.Pool.Exec(ctx, query,
 		category.Name, category.ID)
 	if err != nil {
 		return fmt.Errorf("row UPDATE error: %w", err)
+	}
+
+	if tag.RowsAffected() == 0 {
+		return fmt.Errorf("category with id %d does not exist", category.ID)
 	}
 
 	return

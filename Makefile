@@ -39,13 +39,13 @@ swag:
 	swag init -g $(MAIN_PATH) --output docs
 
 test:
-	go test ./... -v
-
-docker-build:
-	docker build -t inventory-control:latest -f Dockerfile.inventory-control .
+	go test ./... -v | findstr /V "testcontainers 🐳 ✅ ⏳ 🔔 🚫" || echo.
 
 docker-testrun:
 	docker run --rm -it inventory-control:latest
+
+docker-build:
+	docker build -t inventory-control:latest -f Dockerfile.inventory-control .
 
 docker-run:
 	docker run --rm -p 8080:8080 -e "CONFIG_PATH=configs/.env" --name inventory-control inventory-control:latest

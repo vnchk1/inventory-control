@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/vnchk1/inventory-control/internal/mocks"
 	"github.com/vnchk1/inventory-control/internal/models"
-	"github.com/vnchk1/inventory-control/testutils"
 	"strings"
 	"testing"
 )

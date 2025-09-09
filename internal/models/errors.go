@@ -10,7 +10,7 @@ var (
 	ErrEnvLoad       = errors.New("error loading .env file")
 	ErrCfgPath       = errors.New("CONFIG_PATH is required")
 	ErrFieldRequired = errors.New("field is required")
-	ErrNegative      = errors.New("cannot be negative")
+	ErrNegative      = errors.New("cannot be zero or negative")
 	ErrTooManyItems  = errors.New("too many items")
 )
 

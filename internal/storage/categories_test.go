@@ -5,7 +5,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"github.com/vnchk1/inventory-control/internal/models"
-	"github.com/vnchk1/inventory-control/testutils"
 	"testing"
 )
 
@@ -48,7 +47,7 @@ func TestCategoryStorage_Create(t *testing.T) {
 
 			ctx := context.Background()
 
-			testDB, cleanup := testutils.SetupTestContainer(t)
+			testDB, cleanup := SetupTestContainer(t)
 			defer cleanup()
 
 			if tt.prepare != nil {
@@ -108,7 +107,7 @@ func TestCategoryStorage_Update(t *testing.T) {
 
 			ctx := context.Background()
 
-			testDB, cleanup := testutils.SetupTestContainer(t)
+			testDB, cleanup := SetupTestContainer(t)
 			defer cleanup()
 
 			catStore := NewCategoryStorage(testDB)
@@ -170,7 +169,7 @@ func TestCategoryStorage_Read(t *testing.T) {
 
 			ctx := context.Background()
 
-			testDB, cleanup := testutils.SetupTestContainer(t)
+			testDB, cleanup := SetupTestContainer(t)
 			defer cleanup()
 
 			catStore := NewCategoryStorage(testDB)
@@ -219,7 +218,7 @@ func TestCategoryStorage_Delete(t *testing.T) {
 
 			ctx := context.Background()
 
-			testDB, cleanup := testutils.SetupTestContainer(t)
+			testDB, cleanup := SetupTestContainer(t)
 			defer cleanup()
 
 			catStore := NewCategoryStorage(testDB)

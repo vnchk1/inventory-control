@@ -1,4 +1,4 @@
-package testutils
+package storage
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"github.com/vnchk1/inventory-control/internal/config"
-	"github.com/vnchk1/inventory-control/internal/storage"
 	"testing"
 	"time"
 )
@@ -19,7 +18,7 @@ var (
 	migPath = "C:/Users/user/GolandProjects/inventory-control/migrations"
 )
 
-func SetupTestContainer(t *testing.T) (*storage.DB, func()) {
+func SetupTestContainer(t *testing.T) (*DB, func()) {
 	ctx := context.Background()
 
 	req := testcontainers.ContainerRequest{
@@ -63,7 +62,7 @@ func SetupTestContainer(t *testing.T) (*storage.DB, func()) {
 		Migrator: nil,
 	}
 
-	testDB, err := storage.NewDB(cfg)
+	testDB, err := NewDB(cfg)
 	require.NoError(t, err)
 
 	sqlDB, err := sql.Open("postgres", testDB.GetConnString(cfg))

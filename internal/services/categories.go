@@ -7,6 +7,7 @@ import (
 	"github.com/vnchk1/inventory-control/internal/models"
 )
 
+//go:generate mockgen -source=categories.go -destination=../mocks/category_repo_mock.go -package=mocks
 type CategoryRepo interface {
 	Create(ctx context.Context, category *models.Category) error
 	Read(ctx context.Context, id int) (models.Category, error)
@@ -25,6 +26,10 @@ func NewCategoryService(storage CategoryRepo) *CategoryService {
 }
 
 func (c *CategoryService) Read(ctx context.Context, id int) (category models.Category, err error) {
+	if id <= 0 {
+		return models.Category{}, models.NewNegativeErr("id")
+	}
+
 	category, err = c.Storage.Read(ctx, id)
 	if err != nil {
 		return models.Category{}, fmt.Errorf("storage.categories.Read: %w", err)
@@ -35,7 +40,7 @@ func (c *CategoryService) Read(ctx context.Context, id int) (category models.Cat
 
 func (c *CategoryService) Update(ctx context.Context, category models.Category) (err error) {
 	if category.ID <= 0 {
-		return models.NewEmptyErr("id")
+		return models.NewNegativeErr("id")
 	}
 
 	if category.Name == "" {

@@ -25,6 +25,24 @@ func NewCategoryService(storage CategoryRepo) *CategoryService {
 	}
 }
 
+func (c *CategoryService) Create(ctx context.Context, category *models.Category) (err error) {
+	if category.Name == "" {
+		return models.NewEmptyErr("name")
+	}
+
+	if len(category.Name) > 100 {
+		return models.ErrTooManyItems
+	}
+
+	err = c.Storage.Create(ctx, category)
+
+	if err != nil {
+		return fmt.Errorf("storage.categories.Create: %w", err)
+	}
+
+	return
+}
+
 func (c *CategoryService) Read(ctx context.Context, id int) (category models.Category, err error) {
 	if id <= 0 {
 		return models.Category{}, models.NewNegativeErr("id")
@@ -67,24 +85,6 @@ func (c *CategoryService) Delete(ctx context.Context, id int) (err error) {
 	err = c.Storage.Delete(ctx, id)
 	if err != nil {
 		return fmt.Errorf("storage.categories.Delete: %w", err)
-	}
-
-	return
-}
-
-func (c *CategoryService) Create(ctx context.Context, category *models.Category) (err error) {
-	if category.Name == "" {
-		return models.NewEmptyErr("name")
-	}
-
-	if len(category.Name) > 100 {
-		return models.ErrTooManyItems
-	}
-
-	err = c.Storage.Create(ctx, category)
-
-	if err != nil {
-		return fmt.Errorf("storage.categories.Create: %w", err)
 	}
 
 	return

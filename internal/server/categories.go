@@ -11,6 +11,7 @@ import (
 	"github.com/vnchk1/inventory-control/internal/models"
 )
 
+//go:generate mockgen -source=categories.go -destination=../mocks/category_usecase_mock.go -package=mocks
 type (
 	CategoryUseCase interface {
 		Create(ctx context.Context, category *models.Category) error
@@ -34,7 +35,7 @@ func NewCategoryHandler(uc CategoryUseCase, logger *slog.Logger) *CategoryHandle
 
 //nolint:varnamelen
 func (p *CategoryHandler) Create(c echo.Context) error {
-	var req *models.Category
+	var req models.Category
 
 	err := c.Bind(&req)
 	if err != nil {
@@ -43,7 +44,7 @@ func (p *CategoryHandler) Create(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 
-	err = p.Service.Create(c.Request().Context(), req)
+	err = p.Service.Create(c.Request().Context(), &req)
 
 	if err != nil {
 		p.Logger.Error("services.categories.Create", "error", err)
@@ -99,6 +100,8 @@ func (p *CategoryHandler) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		p.Logger.Error("Invalid ID", "error", err)
+
+		return c.JSON(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
 	}
 
 	err = p.Service.Delete(c.Request().Context(), id)

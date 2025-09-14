@@ -21,7 +21,6 @@ func NewDB(cfg *config.Config) (*DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("db connect error: %w", err)
 	}
-
 	return &DB{Pool: pool}, nil
 }
 

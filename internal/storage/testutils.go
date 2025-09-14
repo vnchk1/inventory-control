@@ -10,13 +10,17 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"github.com/vnchk1/inventory-control/internal/config"
+	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 )
 
-var (
-	migPath = "C:/Users/user/GolandProjects/inventory-control/migrations"
-)
+func funcMigPath() string {
+	_, file, _, _ := runtime.Caller(0)
+	dir := filepath.Dir(file)
+	return filepath.Join(dir, "../../migrations")
+}
 
 func SetupTestContainer(t *testing.T) (*DB, func()) {
 	ctx := context.Background()
@@ -71,6 +75,7 @@ func SetupTestContainer(t *testing.T) (*DB, func()) {
 
 	err = goose.SetDialect("postgres")
 	require.NoError(t, err)
+	migPath := funcMigPath()
 	err = goose.Up(sqlDB, migPath)
 	require.NoError(t, err)
 

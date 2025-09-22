@@ -1,0 +1,33 @@
+# Игнорируем директорию с зависимостями (если используется go mod)
+vendor/
+
+# Игнорируем бинарные файлы и исполняемые файлы
+bin/
+*.exe
+*.out
+
+# Игнорируем скрытые файлы и директории
+.*/
+.*
+*.swp
+*.swo
+
+# Игнорируем логи
+*.log
+
+# Игнорируем временные файлы IDE и редакторов
+.idea/
+.vscode/
+*.code-workspace
+
+# Игнорируем тестовые и CI-файлы (если не нужны в образе)
+coverage.txt
+*.test
+.ci/
+
+# Игнорируем сам Dockerfile.inventory-control и docker-compose (если не нужно копировать)
+Dockerfile.inventory-control
+Dockerfile.migrator
+docker-compose*.yml
+
+plan.txt

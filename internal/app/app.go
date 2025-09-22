@@ -1,0 +1,121 @@
+package app
+
+import (
+	"context"
+	"errors"
+	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/vnchk1/inventory-control/internal/config"
+	"github.com/vnchk1/inventory-control/internal/server"
+	"github.com/vnchk1/inventory-control/internal/services"
+	"github.com/vnchk1/inventory-control/internal/storage"
+)
+
+var ErrDBConnectionFailed = errors.New("DB connection failed")
+
+const (
+	ShutdownTimeoutSeconds = 5
+)
+
+type App struct {
+	Server *server.Server
+	DB     *storage.DB
+	Logger *slog.Logger
+}
+
+func NewApp(cfg *config.Config, logger *slog.Logger) (*App, error) {
+	pool, err := storage.NewDB(cfg)
+	if err != nil {
+		logger.Error("Error connecting to DB: %v\n", "error", err)
+
+		return nil, ErrDBConnectionFailed
+	}
+
+	logger.Debug("Connected to DB", "conn string", pool.GetConnString(cfg))
+
+	categoryStorage := storage.NewCategoryStorage(pool)
+	categoryService := services.NewCategoryService(categoryStorage)
+
+	productStorage := storage.NewProductStorage(pool)
+	productService := services.NewProductService(productStorage)
+
+	handlers := server.NewHandlers(categoryService, productService, logger)
+
+	newServer := server.NewServer(cfg, logger)
+	logger.Debug("Starting server", "port", newServer.Config.Server.Port)
+
+	newServer.RegisterRoutes(handlers)
+
+	return &App{
+		Server: newServer,
+		DB:     pool,
+		Logger: logger,
+	}, nil
+}
+
+func (p *App) Run() (err error) {
+	err = p.Server.Run()
+	if err != nil {
+		p.Logger.Error("app.Run: %v\n", "error", err)
+
+		return
+	}
+
+	return
+}
+
+func (p *App) Stop(ctx context.Context) (err error) {
+	p.Logger.Debug("Server stopping...")
+
+	if err = p.Server.Stop(ctx); err != nil {
+		p.Logger.Error("app.Stop: ", "error", err)
+
+		return
+	}
+
+	p.Logger.Debug("DB pool closing...")
+
+	dbClosed := make(chan struct{})
+
+	go func() {
+		defer close(dbClosed)
+		p.DB.Close()
+	}()
+
+	select {
+	case <-dbClosed:
+		p.Logger.Debug("DB closed successfully")
+	case <-ctx.Done():
+		p.Logger.Warn("DB close interrupted by context timeout")
+
+		return ctx.Err()
+	}
+
+	return nil
+}
+
+func Shutdown(app *App) {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+	app.Logger.Debug("Shutting down app...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), ShutdownTimeoutSeconds*time.Second)
+	defer cancel()
+
+	err := app.Stop(ctx)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			app.Logger.Warn("Shutdown timed out - some resources may not be fully released")
+		} else {
+			app.Logger.Error("Shutdown failed:", "error", err)
+		}
+	} else {
+		app.Logger.Debug("Graceful shutdown completed")
+	}
+}

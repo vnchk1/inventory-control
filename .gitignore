@@ -4,10 +4,7 @@
 *.exe
 *.out
 *.bin
-*.env
 # Файлы зависимостей Go
-/go.mod
-/go.sum
 /vendor/
 
 # Директории IDE и редакторов
@@ -32,3 +29,4 @@ Thumbs.db
 *.grpc.pb.go
 
 plan.txt
+promt.txt

@@ -28,5 +28,7 @@ Thumbs.db
 *.pb.gw.go
 *.grpc.pb.go
 
+.env
+
 plan.txt
 promt.txt
